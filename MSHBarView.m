@@ -7,6 +7,7 @@
 
     if (self) {
         self.barCornerRadius = 13;
+        self.barSpacing = 5;
     }
 
     return self;
@@ -48,9 +49,9 @@
     }
 
     int i = 0;
-    CGFloat width = (self.frame.size.width - 5)/(CGFloat)self.numberOfPoints;
+    CGFloat width = (self.frame.size.width - self.barSpacing)/(CGFloat)self.numberOfPoints;
     for (CALayer *layer in [self.layer sublayers]) {
-        layer.frame = CGRectMake(i*width + 5, self.points[i].y, width - 5, self.frame.size.height-self.points[i].y);
+        layer.frame = CGRectMake(i*width + self.barSpacing, self.points[i].y, width - self.barSpacing, self.frame.size.height-self.points[i].y);
         i++;
     }
 }
