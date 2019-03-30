@@ -52,6 +52,7 @@
     int i = 0;
     CGFloat width = (self.frame.size.width - self.barSpacing)/(CGFloat)self.numberOfPoints;
     for (CALayer *layer in [self.layer sublayers]) {
+        if (!layer) continue;
         layer.frame = CGRectMake(i*width + self.barSpacing, self.points[i].y, width - self.barSpacing, self.frame.size.height-self.points[i].y);
         i++;
     }
