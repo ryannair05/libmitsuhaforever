@@ -78,6 +78,9 @@ const int one = 1;
                         retries = 0;
                         if (self.delegate) {
                             [self.delegate updateBuffer:data withLength:rlen/sizeof(float)];
+                        } else {
+                            close(connfd);
+                            connfd = -2;
                         }
                     } else {
                         if (rlen == 0) close(connfd);
