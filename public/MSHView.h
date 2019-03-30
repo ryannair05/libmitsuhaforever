@@ -6,6 +6,7 @@
 
 @interface MSHView : UIView <MSHAudioDelegate, MSHAudioProcessingDelegate> {
     NSUInteger cachedLength;
+    NSUInteger cachedNumberOfPoints;
     long long silentSince;
     bool mshHidden;
     int bufferLog2;

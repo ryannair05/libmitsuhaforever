@@ -111,9 +111,9 @@ static CGPoint controlPointForPoints(CGPoint p1, CGPoint p2) {
     }else{
         float pixelFixer = self.bounds.size.width/self.numberOfPoints;
         
-        if(cachedLength != self.numberOfPoints){
+        if(cachedNumberOfPoints != self.numberOfPoints){
             self.points = (CGPoint *)malloc(sizeof(CGPoint) * self.numberOfPoints);
-            cachedLength = self.numberOfPoints;
+            cachedNumberOfPoints = self.numberOfPoints;
             
             for (int i = 0; i < self.numberOfPoints; i++){
                 self.points[i].x = i*pixelFixer;

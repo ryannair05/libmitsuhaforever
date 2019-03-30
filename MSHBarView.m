@@ -24,15 +24,17 @@
 }
 
 -(void)resetWaveLayers{
-    for (CALayer *layer in [self.layer sublayers]) {
-        [layer removeFromSuperlayer];
-    }
+    self.layer.sublayers = nil;
 
+    CGFloat width = (self.frame.size.width - self.barSpacing)/(CGFloat)self.numberOfPoints;
     for (int i = 0; i < self.numberOfPoints; i++) {
         CALayer *layer = [[CALayer alloc] init];
         layer.cornerRadius = self.barCornerRadius;
+        layer.frame = CGRectMake(i*width + self.barSpacing, 0, width - self.barSpacing, self.frame.size.height);
         [self.layer addSublayer:layer];
     }
+
+    cachedNumberOfPoints = self.numberOfPoints;
 }
 
 -(void)updateWaveColor:(UIColor *)waveColor subwaveColor:(UIColor *)subwaveColor{
@@ -44,7 +46,7 @@
 - (void)redraw{
     [super redraw];
     
-    if (cachedLength != self.numberOfPoints) {
+    if (cachedNumberOfPoints != self.numberOfPoints) {
         [self resetWaveLayers];
     }
 

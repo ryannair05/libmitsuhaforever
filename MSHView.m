@@ -13,7 +13,7 @@
     self = [super initWithFrame:frame];
 
     if (self) {
-        self.numberOfPoints = 16;
+        self.numberOfPoints = 8;
         self.waveOffset = 0;
         self.gain = 0;
         self.limiter = 0;

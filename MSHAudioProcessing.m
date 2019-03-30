@@ -33,7 +33,7 @@
         vDSP_fft_zrip(fftSetup, &output, 1, bufferLog2, FFT_FORWARD);
         vDSP_zvabs(&output, 1, out, 1, numberOfFramesOver2);
         vDSP_vsmul(out, 1, &fftNormFactor, out, 1, numberOfFramesOver2);
-        [self.delegate setSampleData:out length:numberOfFramesOver2/16];
+        [self.delegate setSampleData:out length:numberOfFramesOver2/8];
     } else {
         [self.delegate setSampleData:data length:length];
     }
