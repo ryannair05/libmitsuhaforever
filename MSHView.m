@@ -20,6 +20,13 @@
         self.sensitivity = 1;
         self.disableBatterySaver = false;
         self.autoHide = true;
+        mshHidden = self.autoHide;
+
+        if (self.autoHide) {
+            [self setAlpha:0.0f];
+        } else {
+            [self setAlpha:1.0f];
+        }
 
         self.audioSource = audioSource;
         self.audioSource.delegate = self;
@@ -30,8 +37,6 @@
 
         [self initializeWaveLayers];
 
-        mshHidden = false;
-
         self.shouldUpdate = true;
 
         cachedLength = self.numberOfPoints;
@@ -39,6 +44,18 @@
     }
 
     return self;
+}
+
+-(void)setAutoHide:(BOOL)value {
+    if (value && (silentSince < ((long long)[[NSDate date] timeIntervalSince1970] - 1))) {
+        mshHidden = true;
+        [self setAlpha:0.0f];
+    } else {
+        mshHidden = false;
+        [self setAlpha:1.0f];
+    }
+
+    _autoHide = value;
 }
 
 -(void)stop{

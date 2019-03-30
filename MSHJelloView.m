@@ -30,10 +30,6 @@ static CGPoint controlPointForPoints(CGPoint p1, CGPoint p2) {
     self.waveLayer.zPosition = 0;
     self.subwaveLayer.zPosition = -1;
 
-    if (self.autoHide) {
-        [self setAlpha:0.0f];
-    }
-
     [self configureDisplayLink];
     [self resetWaveLayers];
 
@@ -57,6 +53,8 @@ static CGPoint controlPointForPoints(CGPoint p1, CGPoint p2) {
 }
 
 -(void)updateWaveColor:(UIColor *)waveColor subwaveColor:(UIColor *)subwaveColor{
+    self.waveColor = waveColor;
+    self.subwaveColor = subwaveColor;
     self.waveLayer.fillColor = waveColor.CGColor;
     self.subwaveLayer.fillColor = subwaveColor.CGColor;
 }
