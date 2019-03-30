@@ -5,6 +5,11 @@
 @implementation MSHView
 
 -(instancetype)initWithFrame:(CGRect)frame {
+    self = [self initWithFrame:frame audioSource:[[MSHAudioSourceASS alloc] init]];
+    return self;
+}
+
+-(instancetype)initWithFrame:(CGRect)frame audioSource:(MSHAudioSource *)audioSource {
     self = [super initWithFrame:frame];
 
     if (self) {
@@ -16,7 +21,7 @@
         self.disableBatterySaver = false;
         self.autoHide = true;
 
-        self.audioSource = [[MSHAudioSourceASS alloc] init];
+        self.audioSource = audioSource;
         self.audioSource.delegate = self;
 
         self.audioProcessing = [[MSHAudioProcessing alloc] initWithBufferSize:1024];

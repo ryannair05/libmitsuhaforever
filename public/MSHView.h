@@ -49,5 +49,6 @@
 -(void)setSampleData:(float *)data length:(int)length;
 
 -(instancetype)initWithFrame:(CGRect)frame;
+-(instancetype)initWithFrame:(CGRect)frame audioSource:(MSHAudioSource *)audioSource;
 
 @end
