@@ -11,10 +11,15 @@ const int one = 1;
     empty = (float *)malloc(sizeof(float));
     empty[0] = 0.0f;
 
+    self.isRunning = false;
+
     return self;
 }
 
 -(void)start {
+    forceDisconnect = false;
+    if (self.isRunning) return;
+    self.isRunning = true;
     connfd = -1;
     [self.delegate updateBuffer:empty withLength:1];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -29,7 +34,7 @@ const int one = 1;
         UInt32 len = sizeof(float);
         int retries = 0;
 
-        while (connfd != -2) {
+        while (!forceDisconnect) {
             NSLog(@"[MitsuhaInfinity] Connecting to mediaserverd.");
             retries++;
             connfd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -47,13 +52,13 @@ const int one = 1;
 
             NSLog(@"[MitsuhaInfinity] Connected.");
 
-            if (retries > 10) {
-                connfd = -2;
+            if (retries > 10) {                
+                forceDisconnect = true;
                 NSLog(@"[MitsuhaInfinity] Too many retries. Aborting.");
                 break;
             }
 
-            while(true) {
+            while(!forceDisconnect) {
                 if (connfd < 0) break;
 
                 rlen = recv(connfd, &len, sizeof(UInt32), 0);
@@ -80,7 +85,7 @@ const int one = 1;
                             [self.delegate updateBuffer:data withLength:rlen/sizeof(float)];
                         } else {
                             close(connfd);
-                            connfd = -2;
+                            connfd = -1;
                         }
                     } else {
                         if (rlen == 0) close(connfd);
@@ -91,18 +96,24 @@ const int one = 1;
                 }
             }
 
-            if (connfd == -2) break;
+            if (forceDisconnect) {
+                NSLog(@"[MitsuhaInfinity] Forcefully disconnected.");
+                close(connfd);
+                connfd = -1;
+                self.isRunning = false;
+                break;
+            }
+
             usleep(1000 * 1000);
         }
         
-        NSLog(@"[MitsuhaInfinity] Forcefully disconnected.");
+        NSLog(@"[MitsuhaInfinity] Finally disconnected.");
     });
 }
 
 -(void)stop {
     NSLog(@"[MitsuhaInfinity] Disconnect");
-    close(connfd);
-    connfd = -2;
+    forceDisconnect = true;
 }
 
 -(void)requestUpdate {

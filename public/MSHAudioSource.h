@@ -2,7 +2,7 @@
 
 @interface MSHAudioSource : NSObject
 
-@property (nonatomic, assign, readonly) bool isRunning;
+@property (nonatomic, assign) bool isRunning;
 @property (nonatomic, retain) id<MSHAudioDelegate> delegate;
 
 -(id)init;
