@@ -50,10 +50,17 @@
     }
 
     int i = 0;
-    CGFloat width = (self.frame.size.width - self.barSpacing)/(CGFloat)self.numberOfPoints;
+    CGFloat width = ((self.frame.size.width - self.barSpacing)/(CGFloat)self.numberOfPoints);
+    CGFloat barWidth = width - self.barSpacing;
+    if (width <= 0) width = 1;
+    if (barWidth <= 0) barWidth = 1;
+
     for (CALayer *layer in [self.layer sublayers]) {
         if (!layer) continue;
-        layer.frame = CGRectMake(i*width + self.barSpacing, self.points[i].y, width - self.barSpacing, self.frame.size.height-self.points[i].y);
+        CGFloat barHeight = self.frame.size.height-self.points[i].y;
+        if (barHeight <= 0) barHeight = 1;
+        
+        layer.frame = CGRectMake(i*width + self.barSpacing, self.points[i].y, barWidth, barHeight);
         i++;
     }
 }
