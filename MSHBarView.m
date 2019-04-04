@@ -21,11 +21,15 @@
 -(void)resetWaveLayers{
     self.layer.sublayers = nil;
 
-    CGFloat width = (self.frame.size.width - self.barSpacing)/(CGFloat)self.numberOfPoints;
+    CGFloat width = ((self.frame.size.width - self.barSpacing)/(CGFloat)self.numberOfPoints);
+    CGFloat barWidth = width - self.barSpacing;
+    if (width <= 0) width = 1;
+    if (barWidth <= 0) barWidth = 1;
+
     for (int i = 0; i < self.numberOfPoints; i++) {
         CALayer *layer = [[CALayer alloc] init];
         layer.cornerRadius = self.barCornerRadius;
-        layer.frame = CGRectMake(i*width + self.barSpacing, 0, width - self.barSpacing, self.frame.size.height);
+        layer.frame = CGRectMake(i*width + self.barSpacing, 0, barWidth, self.frame.size.height);
         if (self.waveColor) {
             layer.backgroundColor = self.waveColor.CGColor;
         }
