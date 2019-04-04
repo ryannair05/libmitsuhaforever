@@ -117,14 +117,14 @@ const int one = 1;
 }
 
 -(void)requestUpdate {
-    if (connfd > 0) {
-        int slen = send(connfd, &one, sizeof(int), 0);
-        if (slen <= 0) {
-            if (slen == 0) {
-                close(connfd);
-            }
-            connfd = -1;
+    if (connfd <= 0 || !self.isRunning || forceDisconnect) return;
+    
+    int slen = send(connfd, &one, sizeof(int), 0);
+    if (slen <= 0) {
+        if (slen == 0) {
+            close(connfd);
         }
+        connfd = -1;
     }
 }
 
