@@ -61,6 +61,7 @@
 
     for (CALayer *layer in [self.layer sublayers]) {
         if (!layer) continue;
+        if (isnan(self.points[i].y)) self.points[i].y = 0;
         CGFloat barHeight = self.frame.size.height-self.points[i].y;
         if (barHeight <= 0) barHeight = 1;
         
