@@ -144,6 +144,7 @@
         }
         
         self.points[i].y = (pureValue * self.sensitivity) + self.waveOffset;
+        if (isnan(self.points[i].y)) self.points[i].y = 0;
     }
 }
 
