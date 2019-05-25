@@ -8,8 +8,10 @@ const int one = 1;
 -(id)init {
     self = [super init];
 
-    empty = (float *)malloc(sizeof(float));
-    empty[0] = 0.0f;
+    empty = (float *)malloc(sizeof(float) * 1024);
+    for (int i = 0; i < 1024; i++) {
+        empty[i] = 0.0f;
+    }
 
     self.isRunning = false;
 
@@ -21,7 +23,7 @@ const int one = 1;
     if (self.isRunning) return;
     self.isRunning = true;
     connfd = -1;
-    [self.delegate updateBuffer:empty withLength:1];
+    [self.delegate updateBuffer:empty withLength:1024];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSLog(@"[MitsuhaInfinity] connfd = %d", connfd);
         struct sockaddr_in remote;
@@ -43,6 +45,12 @@ const int one = 1;
                 usleep(1000 * 1000);
                 continue;
             }
+
+            struct timeval tv;
+            tv.tv_sec = 1;
+            tv.tv_usec = 0;
+            setsockopt(connfd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof tv);
+            setsockopt(connfd, SOL_SOCKET, SO_SNDTIMEO, (const char*)&tv, sizeof tv);
             setsockopt(connfd, SOL_SOCKET, SO_NOSIGPIPE, &one, sizeof(one));
 
             while(r != 0) {

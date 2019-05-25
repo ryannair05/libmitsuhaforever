@@ -8,6 +8,7 @@
     NSUInteger cachedLength;
     NSUInteger cachedNumberOfPoints;
     long long silentSince;
+    long long lastUpdate;
     bool mshHidden;
     int bufferLog2;
     FFTSetup fftSetup;

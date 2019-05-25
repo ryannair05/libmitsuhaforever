@@ -87,6 +87,11 @@
 
 - (void)redraw{
     if (self.shouldUpdate) {
+        if (lastUpdate < ((long long)[[NSDate date] timeIntervalSince1970] - 1)) {
+            self.audioSource = [[MSHAudioSourceASS alloc] init];
+            self.audioSource.delegate = self;
+            [self start];
+        }
         [self requestUpdate];
     }
 
@@ -112,6 +117,8 @@
 }
 
 -(void)updateBuffer:(float *)bufferData withLength:(int)length{
+    lastUpdate = (long long)[[NSDate date] timeIntervalSince1970];
+
     if (self.autoHide) {
         for (int i = 0; i < length/4; i++) {
             if (bufferData[i] > 0.000005 || bufferData[i] < -0.000005) {
