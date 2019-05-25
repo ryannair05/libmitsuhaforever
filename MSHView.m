@@ -113,8 +113,8 @@
 
 -(void)updateBuffer:(float *)bufferData withLength:(int)length{
     if (self.autoHide) {
-        for (int i = 0; i < length; i++) {
-            if (bufferData[i] != 0) {
+        for (int i = 0; i < length/4; i++) {
+            if (bufferData[i] > 0.000005 || bufferData[i] < -0.000005) {
                 silentSince = (long long)[[NSDate date] timeIntervalSince1970];
                 break;
             }
