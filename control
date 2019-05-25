@@ -1,6 +1,6 @@
 Package: me.nepeta.libmitsuha
 Name: libmitsuha
-Version: 0.1.6
+Version: 0.1.7
 Architecture: iphoneos-arm
 Description: Audio visualizer library
 Maintainer: Nepeta
