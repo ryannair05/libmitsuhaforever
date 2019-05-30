@@ -25,7 +25,7 @@ const int one = 1;
     connfd = -1;
     [self.delegate updateBuffer:empty withLength:1024];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSLog(@"[MitsuhaInfinity] connfd = %d", connfd);
+        NSLog(@"[libmitsuha] connfd = %d", connfd);
         struct sockaddr_in remote;
         remote.sin_family = PF_INET;
         remote.sin_port = htons(ASSPort);
@@ -37,7 +37,7 @@ const int one = 1;
         int retries = 0;
 
         while (!forceDisconnect) {
-            NSLog(@"[MitsuhaInfinity] Connecting to mediaserverd.");
+            NSLog(@"[libmitsuha] Connecting to mediaserverd.");
             retries++;
             connfd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
 
@@ -58,11 +58,11 @@ const int one = 1;
                 usleep(200 * 1000);
             }
 
-            NSLog(@"[MitsuhaInfinity] Connected.");
+            NSLog(@"[libmitsuha] Connected.");
 
             if (retries > 10) {                
                 forceDisconnect = true;
-                NSLog(@"[MitsuhaInfinity] Too many retries. Aborting.");
+                NSLog(@"[libmitsuha] Too many retries. Aborting.");
                 break;
             }
 
@@ -105,7 +105,7 @@ const int one = 1;
             }
 
             if (forceDisconnect) {
-                NSLog(@"[MitsuhaInfinity] Forcefully disconnected.");
+                NSLog(@"[libmitsuha] Forcefully disconnected.");
                 close(connfd);
                 connfd = -1;
                 self.isRunning = false;
@@ -115,12 +115,12 @@ const int one = 1;
             usleep(1000 * 1000);
         }
         
-        NSLog(@"[MitsuhaInfinity] Finally disconnected.");
+        NSLog(@"[libmitsuha] Finally disconnected.");
     });
 }
 
 -(void)stop {
-    NSLog(@"[MitsuhaInfinity] Disconnect");
+    NSLog(@"[libmitsuha] Disconnect");
     forceDisconnect = true;
 }
 

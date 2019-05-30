@@ -33,7 +33,7 @@
                                      pointCount:0
                                          inRect:self.bounds];
     
-    NSLog(@"[Mitsuha]: Resetting Wave Layers...");
+    NSLog(@"[libmitsuha]: Resetting Wave Layers...");
     
     self.waveLayer.path = path;
 }
