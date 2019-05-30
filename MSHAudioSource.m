@@ -10,6 +10,4 @@
 
 -(void)stop { }
 
--(void)requestUpdate { }
-
 @end

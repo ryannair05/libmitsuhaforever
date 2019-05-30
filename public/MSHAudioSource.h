@@ -8,6 +8,5 @@
 -(id)init;
 -(void)start;
 -(void)stop;
--(void)requestUpdate;
 
 @end

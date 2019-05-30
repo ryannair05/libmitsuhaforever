@@ -86,10 +86,6 @@
 }
 
 - (void)redraw{
-    if (self.shouldUpdate) {
-        [self requestUpdate];
-    }
-
     if (self.autoHide) {
         if (silentSince < ((long long)[[NSDate date] timeIntervalSince1970] - 1)) {
             if (!mshHidden) {
@@ -105,10 +101,6 @@
             }];
         }
     }
-}
-
--(void)requestUpdate{
-    [self.audioSource requestUpdate];
 }
 
 -(void)updateBuffer:(float *)bufferData withLength:(int)length{

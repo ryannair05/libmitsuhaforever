@@ -47,7 +47,6 @@
 -(void)resetWaveLayers;
 -(void)redraw;
 
--(void)requestUpdate;
 -(void)updateBuffer:(float *)bufferData withLength:(int)length;
 
 -(void)setSampleData:(float *)data length:(int)length;

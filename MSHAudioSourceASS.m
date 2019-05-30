@@ -47,7 +47,7 @@ const int one = 1;
 
             struct timeval tv;
             tv.tv_sec = 0;
-            tv.tv_usec = 500000;
+            tv.tv_usec = 50000;
             setsockopt(connfd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof tv);
             setsockopt(connfd, SOL_SOCKET, SO_SNDTIMEO, (const char*)&tv, sizeof tv);
             setsockopt(connfd, SOL_SOCKET, SO_NOSIGPIPE, &one, sizeof(one));
@@ -88,19 +88,25 @@ const int one = 1;
                 if (connfd < 0) break;
                 result = select(connfd+1, &readset, NULL, NULL, &tv);
 
-                if (result < 0) break;
+                if (result < 0) {
+                    close(connfd);
+                    break;
+                }
 
                 rlen = recv(connfd, &len, sizeof(UInt32), 0);
 
                 if (connfd < 0) break;
 
                 if (rlen < sizeof(UInt32)) {
-                    if (rlen == 0) close(connfd);
+                    close(connfd);
                     connfd = -1;
                     break;
                 }
 
-                if (len > 8192 || len < 0) break;
+                if (len > 8192 || len < 0) {
+                    close(connfd);
+                    break;
+                }
 
                 if (len > sizeof(float)) {
                     free(data);
@@ -124,6 +130,14 @@ const int one = 1;
                         data = empty;
                     }
                 }
+
+                usleep(16 * 1000);
+                rlen = send(connfd, &one, sizeof(int), 0);
+                if (rlen <= 0) {
+                    close(connfd);
+                    connfd = -1;
+                    break;
+                }
             }
 
             if (forceDisconnect) {
@@ -145,18 +159,6 @@ const int one = 1;
 -(void)stop {
     NSLog(@"[libmitsuha] -(void)stop called");
     forceDisconnect = true;
-}
-
--(void)requestUpdate {
-    if (connfd <= 0 || !self.isRunning || forceDisconnect) return;
-    
-    int slen = send(connfd, &one, sizeof(int), 0);
-    if (slen <= 0) {
-        if (slen == 0) {
-            close(connfd);
-        }
-        connfd = -1;
-    }
 }
 
 @end
