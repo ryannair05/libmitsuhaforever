@@ -77,6 +77,7 @@ const int one = 1;
                 break;
             }
 
+            retries = 0;
             NSLog(@"[libmitsuha] Connected.");
 
             fd_set readset;
