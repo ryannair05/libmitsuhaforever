@@ -43,6 +43,7 @@ const int one = 1;
 
             if (connfd == -1) {
                 usleep(1000 * 1000);
+                NSLog(@"[libmitsuha] Connection failed.");
                 continue;
             }
 
@@ -53,18 +54,27 @@ const int one = 1;
             setsockopt(connfd, SOL_SOCKET, SO_SNDTIMEO, (const char*)&tv, sizeof tv);
             setsockopt(connfd, SOL_SOCKET, SO_NOSIGPIPE, &one, sizeof(one));
 
-            while(r != 0) {
+            int cretries = 0;
+            while (r != 0 && cretries < 10) {
+                cretries++;
                 r = connect(connfd, (struct sockaddr *)&remote, sizeof(remote));
                 usleep(200 * 1000);
             }
 
-            NSLog(@"[libmitsuha] Connected.");
+            if (r != 0) {
+                NSLog(@"[libmitsuha] Connection failed.");
+                retries++;
+                usleep(1000 * 1000);
+                continue;
+            }
 
-            if (retries > 10) {                
+            if (retries > 10) {
                 forceDisconnect = true;
                 NSLog(@"[libmitsuha] Too many retries. Aborting.");
                 break;
             }
+
+            NSLog(@"[libmitsuha] Connected.");
 
             while(!forceDisconnect) {
                 if (connfd < 0) break;
