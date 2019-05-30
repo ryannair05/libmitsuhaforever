@@ -1,4 +1,5 @@
 #import <arpa/inet.h>
+#import <sys/time.h>
 #import "public/MSHAudioSourceASS.h"
 
 const int one = 1;
@@ -19,24 +20,21 @@ const int one = 1;
 }
 
 -(void)start {
+    NSLog(@"[libmitsuha] -(void)start called");
     forceDisconnect = false;
     if (self.isRunning) return;
     self.isRunning = true;
     connfd = -1;
     [self.delegate updateBuffer:empty withLength:1024];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSLog(@"[libmitsuha] connfd = %d", connfd);
-        struct sockaddr_in remote;
-        remote.sin_family = PF_INET;
-        remote.sin_port = htons(ASSPort);
-        inet_aton("127.0.0.1", &remote.sin_addr);
-        int r = -1;
-        int rlen = 0;
-        float *data = NULL;
-        UInt32 len = sizeof(float);
         int retries = 0;
 
         while (!forceDisconnect) {
+            int r = -1;
+            int rlen = 0;
+            float *data = NULL;
+            UInt32 len = sizeof(float);
+            
             NSLog(@"[libmitsuha] Connecting to mediaserverd.");
             retries++;
             connfd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -48,13 +46,18 @@ const int one = 1;
             }
 
             struct timeval tv;
-            tv.tv_sec = 1;
-            tv.tv_usec = 0;
+            tv.tv_sec = 0;
+            tv.tv_usec = 500000;
             setsockopt(connfd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof tv);
             setsockopt(connfd, SOL_SOCKET, SO_SNDTIMEO, (const char*)&tv, sizeof tv);
             setsockopt(connfd, SOL_SOCKET, SO_NOSIGPIPE, &one, sizeof(one));
 
+            struct sockaddr_in remote;
+            remote.sin_family = PF_INET;
+            remote.sin_port = htons(ASSPort);
+            inet_aton("127.0.0.1", &remote.sin_addr);
             int cretries = 0;
+            
             while (r != 0 && cretries < 10) {
                 cretries++;
                 r = connect(connfd, (struct sockaddr *)&remote, sizeof(remote));
@@ -76,19 +79,28 @@ const int one = 1;
 
             NSLog(@"[libmitsuha] Connected.");
 
+            fd_set readset;
+            int result = -1;
+            FD_ZERO(&readset);
+            FD_SET(connfd, &readset);
+
             while(!forceDisconnect) {
                 if (connfd < 0) break;
+                result = select(connfd+1, &readset, NULL, NULL, &tv);
+
+                if (result < 0) break;
 
                 rlen = recv(connfd, &len, sizeof(UInt32), 0);
 
                 if (connfd < 0) break;
 
-                if (rlen <= 0) {
+                if (rlen < sizeof(UInt32)) {
                     if (rlen == 0) close(connfd);
                     connfd = -1;
-                    len = sizeof(float);
-                    data = empty;
+                    break;
                 }
+
+                if (len > 8192 || len < 0) break;
 
                 if (len > sizeof(float)) {
                     free(data);
@@ -122,6 +134,7 @@ const int one = 1;
                 break;
             }
 
+            NSLog(@"[libmitsuha] Lost connection.");
             usleep(1000 * 1000);
         }
         
@@ -130,7 +143,7 @@ const int one = 1;
 }
 
 -(void)stop {
-    NSLog(@"[libmitsuha] Disconnect");
+    NSLog(@"[libmitsuha] -(void)stop called");
     forceDisconnect = true;
 }
 
