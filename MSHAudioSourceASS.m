@@ -145,13 +145,14 @@ const int one = 1;
                 NSLog(@"[libmitsuha] Forcefully disconnected.");
                 close(connfd);
                 connfd = -1;
-                self.isRunning = false;
                 break;
             }
 
             NSLog(@"[libmitsuha] Lost connection.");
             usleep(1000 * 1000);
         }
+        
+        self.isRunning = false;
         
         NSLog(@"[libmitsuha] Finally disconnected.");
     });
