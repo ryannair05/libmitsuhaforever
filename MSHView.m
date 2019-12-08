@@ -1,8 +1,12 @@
 #import "public/MSHView.h"
 #import "public/MSHAudioSourceASS.h"
+#import <Cephei/HBPreferences.h>
 #import <ConorTheDev/libconorthedev.h>
 
 @implementation MSHView
+
+HBPreferences *file;
+BOOL boost;
 
 - (instancetype)initWithFrame:(CGRect)frame {
   self = [self initWithFrame:frame
@@ -43,6 +47,11 @@
 
     cachedLength = self.numberOfPoints;
     self.points = (CGPoint *)malloc(sizeof(CGPoint) * self.numberOfPoints);
+
+    file = [[HBPreferences alloc] initWithIdentifier:MSHPreferencesIdentifier];
+
+    [file registerDefaults:@{@"MSHAirpodsSensBoost" : @NO}];
+    [file registerBool:&boost default:NO forKey:@"MSHAirpodsSensBoost"];
   }
 
   return self;
@@ -146,7 +155,17 @@
                        : (pureValue < 0 ? -1 * self.limiter : self.limiter));
     }
 
-    self.points[i].y = (pureValue * self.sensitivity) + self.waveOffset;
+    NSLog(@"[libmitsuha] Will boost? %d", boost);
+
+    if (boost) {
+      self.points[i].y =
+          ((pureValue * self.sensitivity) * 5.0) + self.waveOffset;
+    } else {
+      self.points[i].y = (pureValue * self.sensitivity) + self.waveOffset;
+    }
+
+    NSLog(@"[libmitsuha] Sensitivity %f:", self.points[i].y);
+
     if (isnan(self.points[i].y))
       self.points[i].y = 0;
   }
