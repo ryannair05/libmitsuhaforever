@@ -155,16 +155,12 @@ BOOL boost;
                        : (pureValue < 0 ? -1 * self.limiter : self.limiter));
     }
 
-    NSLog(@"[libmitsuha] Will boost? %d", boost);
-
     if (boost) {
       self.points[i].y =
           ((pureValue * self.sensitivity) * 5.0) + self.waveOffset;
     } else {
       self.points[i].y = (pureValue * self.sensitivity) + self.waveOffset;
     }
-
-    NSLog(@"[libmitsuha] Sensitivity %f:", self.points[i].y);
 
     if (isnan(self.points[i].y))
       self.points[i].y = 0;
