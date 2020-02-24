@@ -1,9 +1,9 @@
-Package: me.conorthedev.libmitsuha
-Name: libmitsuha
-Version: 0.2.0
+Package: me.conorthedev.libmitsuhaforever
+Name: libmitsuhaforever
+Version: 1.0.0
 Architecture: iphoneos-arm
-Description: Audio visualizer library
+Description: An advanced audio visualizer library for Mitsuha Forever
 Maintainer: ConorTheDev <con0r.b@protonmail.com>
 Author: ConorTheDev, Nepeta
 Section: Development
-Depends: me.conorthedev.audiosnapshotserver, me.conorthedev.libconorthedev, firmware (>= 9.0)
+Depends: mobilesubstrate, me.conorthedev.audiosnapshotserver, me.conorthedev.libconorthedev, firmware (>= 11.0)

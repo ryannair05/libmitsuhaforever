@@ -1,17 +1,17 @@
-#import "MSHAudioDelegate.h"
-#import "MSHAudioProcessing.h"
-#import "MSHAudioProcessingDelegate.h"
-#import "MSHAudioSource.h"
+#import "MSHFFAudioDelegate.h"
+#import "MSHFFAudioProcessing.h"
+#import "MSHFFAudioProcessingDelegate.h"
+#import "MSHFFAudioSource.h"
 #import <UIKit/UIKit.h>
 
-#define MSHPreferencesIdentifier @"me.conorthedev.mitsuhaforever"
+#define MSHFPreferencesIdentifier @"me.conorthedev.mitsuhaforever"
 
-@interface MSHView : UIView <MSHAudioDelegate, MSHAudioProcessingDelegate> {
+@interface MSHFView : UIView <MSHFAudioDelegate, MSHFAudioProcessingDelegate> {
   NSUInteger cachedLength;
   NSUInteger cachedNumberOfPoints;
   long long silentSince;
   long long lastUpdate;
-  bool mshHidden;
+  bool MSHFHidden;
   int bufferLog2;
   FFTSetup fftSetup;
   float *window;
@@ -35,8 +35,8 @@
 @property(nonatomic, strong) UIColor *waveColor;
 @property(nonatomic, strong) UIColor *subwaveColor;
 
-@property(nonatomic, retain) MSHAudioSource *audioSource;
-@property(nonatomic, retain) MSHAudioProcessing *audioProcessing;
+@property(nonatomic, retain) MSHFAudioSource *audioSource;
+@property(nonatomic, retain) MSHFAudioProcessing *audioProcessing;
 
 - (void)updateWaveColor:(UIColor *)waveColor
            subwaveColor:(UIColor *)subwaveColor;
@@ -56,6 +56,6 @@
 
 - (instancetype)initWithFrame:(CGRect)frame;
 - (instancetype)initWithFrame:(CGRect)frame
-                  audioSource:(MSHAudioSource *)audioSource;
+                  audioSource:(MSHFAudioSource *)audioSource;
 
 @end

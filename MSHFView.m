@@ -1,21 +1,21 @@
-#import "public/MSHView.h"
-#import "public/MSHAudioSourceASS.h"
+#import "public/MSHFView.h"
+#import "public/MSHFAudioSourceASS.h"
 #import <Cephei/HBPreferences.h>
 #import <ConorTheDev/libconorthedev.h>
 
-@implementation MSHView
+@implementation MSHFView
 
 HBPreferences *file;
 BOOL boost;
 
 - (instancetype)initWithFrame:(CGRect)frame {
   self = [self initWithFrame:frame
-                 audioSource:[[MSHAudioSourceASS alloc] init]];
+                 audioSource:[[MSHFAudioSourceASS alloc] init]];
   return self;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
-                  audioSource:(MSHAudioSource *)audioSource {
+                  audioSource:(MSHFAudioSource *)audioSource {
   self = [super initWithFrame:frame];
 
   if (self) {
@@ -26,7 +26,7 @@ BOOL boost;
     self.sensitivity = 1;
     self.disableBatterySaver = false;
     self.autoHide = true;
-    mshHidden = self.autoHide;
+    MSHFHidden = self.autoHide;
 
     if (self.autoHide) {
       [self setAlpha:0.0f];
@@ -37,7 +37,8 @@ BOOL boost;
     self.audioSource = audioSource;
     self.audioSource.delegate = self;
 
-    self.audioProcessing = [[MSHAudioProcessing alloc] initWithBufferSize:1024];
+    self.audioProcessing =
+        [[MSHFAudioProcessing alloc] initWithBufferSize:1024];
     self.audioProcessing.delegate = self;
     self.audioProcessing.fft = true;
 
@@ -48,10 +49,10 @@ BOOL boost;
     cachedLength = self.numberOfPoints;
     self.points = (CGPoint *)malloc(sizeof(CGPoint) * self.numberOfPoints);
 
-    file = [[HBPreferences alloc] initWithIdentifier:MSHPreferencesIdentifier];
+    file = [[HBPreferences alloc] initWithIdentifier:MSHFPreferencesIdentifier];
 
-    [file registerDefaults:@{@"MSHAirpodsSensBoost" : @NO}];
-    [file registerBool:&boost default:NO forKey:@"MSHAirpodsSensBoost"];
+    [file registerDefaults:@{@"MSHFAirpodsSensBoost" : @NO}];
+    [file registerBool:&boost default:NO forKey:@"MSHFAirpodsSensBoost"];
   }
 
   return self;
@@ -60,10 +61,10 @@ BOOL boost;
 - (void)setAutoHide:(BOOL)value {
   if (value &&
       (silentSince < ((long long)[[NSDate date] timeIntervalSince1970] - 1))) {
-    mshHidden = true;
+    MSHFHidden = true;
     [self setAlpha:0.0f];
   } else {
-    mshHidden = false;
+    MSHFHidden = false;
     [self setAlpha:1.0f];
   }
 
@@ -104,15 +105,15 @@ BOOL boost;
 - (void)redraw {
   if (self.autoHide) {
     if (silentSince < ((long long)[[NSDate date] timeIntervalSince1970] - 1)) {
-      if (!mshHidden) {
-        mshHidden = true;
+      if (!MSHFHidden) {
+        MSHFHidden = true;
         [UIView animateWithDuration:0.5
                          animations:^{
                            [self setAlpha:0.0f];
                          }];
       }
-    } else if (mshHidden) {
-      mshHidden = false;
+    } else if (MSHFHidden) {
+      MSHFHidden = false;
       [UIView animateWithDuration:0.5
                        animations:^{
                          [self setAlpha:1.0f];
@@ -156,8 +157,7 @@ BOOL boost;
     }
 
     if (boost) {
-      self.points[i].y =
-          ((pureValue * self.sensitivity) * 5.0) + self.waveOffset;
+      self.points[i].y = 25 + self.waveOffset;
     } else {
       self.points[i].y = (pureValue * self.sensitivity) + self.waveOffset;
     }

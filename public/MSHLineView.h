@@ -1,12 +1,14 @@
+#import "MSHFFJelloLayer.h"
+#import "MSHFFView.h"
 #import <UIKit/UIKit.h>
-#import "MSHView.h"
-#import "MSHJelloLayer.h"
 
-@interface MSHLineView : MSHView
+@interface MSHFLineView : MSHFView
 
-@property (nonatomic, assign) CGFloat lineThickness;
-@property (nonatomic, strong) MSHJelloLayer *waveLayer;
+@property(nonatomic, assign) CGFloat lineThickness;
+@property(nonatomic, strong) MSHFJelloLayer *waveLayer;
 
--(CGPathRef)createPathWithPoints:(CGPoint *)points pointCount:(NSUInteger)pointCount inRect:(CGRect)rect;
+- (CGPathRef)createPathWithPoints:(CGPoint *)points
+                       pointCount:(NSUInteger)pointCount
+                           inRect:(CGRect)rect;
 
 @end

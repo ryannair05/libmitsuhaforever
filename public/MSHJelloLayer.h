@@ -1,6 +1,6 @@
 #import <UIKit/UIKit.h>
 
-@interface MSHJelloLayer : CAShapeLayer
+@interface MSHFJelloLayer : CAShapeLayer
 
 @property BOOL shouldAnimate;
 
