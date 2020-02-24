@@ -1,7 +1,7 @@
-#import "MSHFFAudioDelegate.h"
-#import "MSHFFAudioProcessing.h"
-#import "MSHFFAudioProcessingDelegate.h"
-#import "MSHFFAudioSource.h"
+#import "MSHFAudioDelegate.h"
+#import "MSHFAudioProcessing.h"
+#import "MSHFAudioProcessingDelegate.h"
+#import "MSHFAudioSource.h"
 #import <UIKit/UIKit.h>
 
 #define MSHFPreferencesIdentifier @"me.conorthedev.mitsuhaforever"

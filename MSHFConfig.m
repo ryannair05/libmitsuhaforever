@@ -1,5 +1,5 @@
-#import "../MSHFUtils.h"
 #import "public/MSHFConfig.h"
+#import "public/MSHFUtils.h"
 #import <Cephei/HBPreferences.h>
 #import <ConorTheDev/libconorthedev.h>
 #import <libcolorpicker.h>
@@ -8,7 +8,7 @@ void notificationCallback(CFNotificationCenterRef center, void *observer,
                           CFStringRef name, void const *object,
                           CFDictionaryRef userInfo) {
   NSLog(@"[MitsuhaForever] prefs changed");
-  MSHFConfig *ob = (MSHFConfig *)observer;
+  MSHFConfig *ob = (MSHFConfig *)CFBridgingRelease(observer);
   [ob reloadConfig];
 }
 
@@ -129,8 +129,8 @@ void notificationCallback(CFNotificationCenterRef center, void *observer,
       _waveColor = [dict objectForKey:@"waveColor"];
     } else if ([[dict objectForKey:@"waveColor"]
                    isKindOfClass:[NSString class]]) {
-      _waveColor = [LCPParseColorString([dict objectForKey:@"waveColor"],
-                                        @"#000000:0.5") retain];
+      _waveColor =
+          LCPParseColorString([dict objectForKey:@"waveColor"], @"#000000:0.5");
     } else {
       _waveColor = [[UIColor blackColor] colorWithAlphaComponent:0.5];
     }
@@ -143,8 +143,8 @@ void notificationCallback(CFNotificationCenterRef center, void *observer,
       _subwaveColor = [dict objectForKey:@"subwaveColor"];
     } else if ([[dict objectForKey:@"subwaveColor"]
                    isKindOfClass:[NSString class]]) {
-      _subwaveColor = [LCPParseColorString([dict objectForKey:@"subwaveColor"],
-                                           @"#000000:0.5") retain];
+      _subwaveColor = LCPParseColorString([dict objectForKey:@"subwaveColor"],
+                                          @"#000000:0.5");
     } else {
       _subwaveColor = [[UIColor blackColor] colorWithAlphaComponent:0.5];
     }

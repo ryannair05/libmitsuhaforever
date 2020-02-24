@@ -1,5 +1,5 @@
-#import "MSHFFJelloLayer.h"
-#import "MSHFFView.h"
+#import "MSHFJelloLayer.h"
+#import "MSHFView.h"
 #import <UIKit/UIKit.h>
 
 @interface MSHFJelloView : MSHFView

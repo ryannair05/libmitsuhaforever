@@ -1,4 +1,4 @@
-#import "MSHFFView.h"
+#import "MSHFView.h"
 #import <UIKit/UIKit.h>
 
 @interface MSHFDotView : MSHFView

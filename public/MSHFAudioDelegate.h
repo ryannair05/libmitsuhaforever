@@ -1,4 +1,4 @@
-@protocol MSHFFAudioDelegate <NSObject>
+@protocol MSHFAudioDelegate <NSObject>
 
 - (void)updateBuffer:(float *)bufferData withLength:(int)length;
 

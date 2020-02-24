@@ -1,7 +1,7 @@
-#import "MSHFFAudioProcessingDelegate.h"
+#import "MSHFAudioProcessingDelegate.h"
 #import <Accelerate/Accelerate.h>
 
-@interface MSHFFAudioProcessing : NSObject {
+@interface MSHFAudioProcessing : NSObject {
   int bufferLog2;
   FFTSetup fftSetup;
   float *window;
