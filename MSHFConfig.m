@@ -1,6 +1,5 @@
 #import "public/MSHFConfig.h"
 #import "public/MSHFUtils.h"
-#import <Cephei/HBPreferences.h>
 #import <ConorTheDev/libconorthedev.h>
 #import <libcolorpicker.h>
 
@@ -177,11 +176,10 @@ void notificationCallback(CFNotificationCenterRef center, void *observer,
   NSMutableDictionary *prefs = [@{} mutableCopy];
   [prefs setValue:name forKey:@"application"];
 
-  HBPreferences *file =
-      [[HBPreferences alloc] initWithIdentifier:MSHFPreferencesIdentifier];
-
+  NSMutableDictionary *file =
+      [[NSMutableDictionary alloc] initWithContentsOfFile:MSHFPrefsFile];
   NSLog(@"[Mitsuha] Preferences: %@", file);
-  for (NSString *key in [file.dictionaryRepresentation allKeys]) {
+  for (NSString *key in [file allKeys]) {
     [prefs setValue:[file objectForKey:key] forKey:key];
   }
 

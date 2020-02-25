@@ -11,6 +11,9 @@
 #define MSHFPreferencesIdentifier @"me.conorthedev.mitsuhaforever"
 #define MSHFColorsIdentifier @"me.conorthedev.mitsuhaforever.colors"
 #define MSHFPreferencesChanged @"me.conorthedev.mitsuhaforever/ReloadPrefs"
+#define MSHFPrefsFile                                                          \
+  @"/var/mobile/Library/Preferences/"                                          \
+  @"me.conorthedev.mitsuhaforever.plist"
 #define MSHFColorsFile                                                         \
   @"/var/mobile/Library/Preferences/"                                          \
   @"me.conorthedev.mitsuhaforever.colors.plist"
@@ -30,3 +33,8 @@
   @"/Library/MobileSubstrate/DynamicLibraries/Artsy.plist"
 #define MSHFAudioBufferSize 1024
 #define ASSPort 44333
+
+@interface NSUserDefaults (Private)
+- (instancetype)_initWithSuiteName:(NSString *)suiteName
+                         container:(NSURL *)container;
+@end
