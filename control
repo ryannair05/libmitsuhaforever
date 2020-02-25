@@ -7,3 +7,4 @@ Maintainer: ConorTheDev <con0r.b@protonmail.com>
 Author: ConorTheDev, Nepeta
 Section: Development
 Depends: mobilesubstrate, me.conorthedev.thiccaudiosnapshotserver, me.conorthedev.libconorthedev, firmware (>= 11.0)
+Provides: me.nepeta.libmitsuha
