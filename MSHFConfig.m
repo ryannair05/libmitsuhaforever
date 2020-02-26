@@ -3,6 +3,8 @@
 #import <ConorTheDev/libconorthedev.h>
 #import <libcolorpicker.h>
 
+NSDictionary *file = nil;
+
 void notificationCallback(CFNotificationCenterRef center, void *observer,
                           CFStringRef name, void const *object,
                           CFDictionaryRef userInfo) {
@@ -176,8 +178,25 @@ void notificationCallback(CFNotificationCenterRef center, void *observer,
   NSMutableDictionary *prefs = [@{} mutableCopy];
   [prefs setValue:name forKey:@"application"];
 
-  NSMutableDictionary *file =
-      [[NSMutableDictionary alloc] initWithContentsOfFile:MSHFPrefsFile];
+  if ([NSHomeDirectory() isEqualToString:@"/var/mobile"]) {
+    CFArrayRef keyList = CFPreferencesCopyKeyList(
+        (CFStringRef)MSHFPreferencesIdentifier, kCFPreferencesCurrentUser,
+        kCFPreferencesAnyHost);
+
+    if (keyList) {
+      file = (NSDictionary *)CFBridgingRelease(CFPreferencesCopyMultiple(
+          keyList, (CFStringRef)MSHFPreferencesIdentifier,
+          kCFPreferencesCurrentUser, kCFPreferencesAnyHost));
+
+      if (!file) {
+        file = [NSDictionary new];
+      }
+      CFRelease(keyList);
+    }
+  } else {
+    file = [NSDictionary dictionaryWithContentsOfFile:MSHFPrefsFile];
+  }
+
   NSLog(@"[Mitsuha] Preferences: %@", file);
   for (NSString *key in [file allKeys]) {
     [prefs setValue:[file objectForKey:key] forKey:key];
