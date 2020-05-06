@@ -7,7 +7,7 @@ $(LIBRARY_NAME)_OBJC_FILES = $(wildcard *.m)
 $(LIBRARY_NAME)_CFLAGS = -I./
 $(LIBRARY_NAME)_FRAMEWORKS += QuartzCore
 $(LIBRARY_NAME)_USE_MODULES = 0
-$(LIBRARY_NAME)_LIBRARIES = conorthedev colorpicker
+$(LIBRARY_NAME)_LIBRARIES = conorthedev
 
 ADDITIONAL_CFLAGS = -Ipublic -Ioverlayheaders -I. -fobjc-arc
 

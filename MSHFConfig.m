@@ -1,7 +1,6 @@
 #import "public/MSHFConfig.h"
 #import "public/MSHFUtils.h"
 #import <ConorTheDev/libconorthedev.h>
-#import <libcolorpicker.h>
 
 NSDictionary *file = nil;
 
@@ -128,10 +127,6 @@ void notificationCallback(CFNotificationCenterRef center, void *observer,
   if ([dict objectForKey:@"waveColor"]) {
     if ([[dict objectForKey:@"waveColor"] isKindOfClass:[UIColor class]]) {
       _waveColor = [dict objectForKey:@"waveColor"];
-    } else if ([[dict objectForKey:@"waveColor"]
-                   isKindOfClass:[NSString class]]) {
-      _waveColor =
-          LCPParseColorString([dict objectForKey:@"waveColor"], @"#000000:0.5");
     } else {
       _waveColor = [[UIColor blackColor] colorWithAlphaComponent:0.5];
     }
@@ -142,10 +137,6 @@ void notificationCallback(CFNotificationCenterRef center, void *observer,
   if ([dict objectForKey:@"subwaveColor"]) {
     if ([[dict objectForKey:@"subwaveColor"] isKindOfClass:[UIColor class]]) {
       _subwaveColor = [dict objectForKey:@"subwaveColor"];
-    } else if ([[dict objectForKey:@"subwaveColor"]
-                   isKindOfClass:[NSString class]]) {
-      _subwaveColor = LCPParseColorString([dict objectForKey:@"subwaveColor"],
-                                          @"#000000:0.5");
     } else {
       _subwaveColor = [[UIColor blackColor] colorWithAlphaComponent:0.5];
     }
