@@ -1,16 +1,10 @@
+
 #import "public/MSHFConfig.h"
 #import "public/MSHFUtils.h"
 #import <ConorTheDev/libconorthedev.h>
 
-NSDictionary *file = nil;
 
-void notificationCallback(CFNotificationCenterRef center, void *observer,
-                          CFStringRef name, void const *object,
-                          CFDictionaryRef userInfo) {
-  NSLog(@"[MitsuhaForever] prefs changed");
-  MSHFConfig *ob = (MSHFConfig *)CFBridgingRelease(observer);
-  [ob reloadConfig];
-}
+NSDictionary *file = nil;
 
 @implementation MSHFConfig
 
@@ -18,16 +12,13 @@ void notificationCallback(CFNotificationCenterRef center, void *observer,
   self = [super init];
   if (self) {
     [self setDictionary:dict];
-    CFNotificationCenterAddObserver(
-        CFNotificationCenterGetDarwinNotifyCenter(),
-        (__bridge const void *)(self),
-        (CFNotificationCallback)notificationCallback,
-        (CFStringRef)MSHFPreferencesChanged, NULL, kNilOptions);
   }
   return self;
 }
 
 - (void)initializeViewWithFrame:(CGRect)frame {
+        NSLog(@"Mitsuha initializeViewWithFrame");
+
   UIView *superview = nil;
   NSUInteger index;
 
@@ -66,11 +57,14 @@ void notificationCallback(CFNotificationCenterRef center, void *observer,
       [superview insertSubview:_view atIndex:index];
     }
   }
+        NSLog(@"Mitsuha initializeViewWithFrame end");
 
   [self configureView];
 }
 
 - (void)configureView {
+    NSLog(@"Mitsuha configureView");
+
   _view.autoHide = self.enableAutoHide;
   _view.displayLink.preferredFramesPerSecond = self.fps;
   _view.numberOfPoints = self.numberOfPoints;
@@ -88,6 +82,9 @@ void notificationCallback(CFNotificationCenterRef center, void *observer,
     [_view updateWaveColor:[self.calculatedColor copy]
               subwaveColor:[self.calculatedColor copy]];
   }
+
+      NSLog(@"Mitsuha configureView end");
+
 }
 
 - (void)colorizeView:(UIImage *)image {
@@ -166,6 +163,7 @@ void notificationCallback(CFNotificationCenterRef center, void *observer,
 }
 
 + (NSDictionary *)parseConfigForApplication:(NSString *)name {
+  NSLog(@"Mitsuha parseConfigForApplication");
   NSMutableDictionary *prefs = [@{} mutableCopy];
   [prefs setValue:name forKey:@"application"];
 
@@ -199,6 +197,8 @@ void notificationCallback(CFNotificationCenterRef center, void *observer,
   for (NSString *key in [colors allKeys]) {
     [prefs setValue:[colors objectForKey:key] forKey:key];
   }
+    NSLog(@"[Mitsuha] prefs: %@", prefs);
+
 
   for (NSString *key in [prefs allKeys]) {
     NSString *removedKey = [key
@@ -218,19 +218,30 @@ void notificationCallback(CFNotificationCenterRef center, void *observer,
   prefs[@"gain"] = [prefs objectForKey:@"gain"] ?: @(50);
   prefs[@"subwaveColor"] = prefs[@"waveColor"];
   prefs[@"waveOffset"] = ([prefs objectForKey:@"waveOffset"] ?: @(0));
+  NSLog(@"Mitsuha parseConfigForApplication end");
 
   return prefs;
 }
 
 - (void)reloadConfig {
+  NSLog(@"Mitsuha reloadConfig");
   int oldStyle = self.style;
+  NSLog(@"Mitsuha oldStyle: %i", oldStyle);
   [self setDictionary:[MSHFConfig parseConfigForApplication:self.application]];
+  NSLog(@"Mitsuha setDictionary");
+  NSLog(@"Mitsuha view: %@", self.view);
   if (self.view) {
+    NSLog(@"Mitsuha style: %d", self.style);
     if (self.style != oldStyle) {
+      NSLog(@"Mitsuha a");
       [self initializeViewWithFrame:self.view.frame];
+      NSLog(@"Mitsuha b");
       [[self view] start];
+      NSLog(@"Mitsuha c");
     } else {
+      NSLog(@"Mitsuha d");
       [self configureView];
+      NSLog(@"Mitsuha e");
     }
   }
 }

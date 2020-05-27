@@ -5,7 +5,6 @@ include $(THEOS)/makefiles/common.mk
 LIBRARY_NAME = libmitsuhaforever
 $(LIBRARY_NAME)_OBJC_FILES = $(wildcard *.m)
 $(LIBRARY_NAME)_CFLAGS = -I./
-$(LIBRARY_NAME)_FRAMEWORKS += QuartzCore
 $(LIBRARY_NAME)_USE_MODULES = 0
 $(LIBRARY_NAME)_LIBRARIES = conorthedev
 
