@@ -34,7 +34,7 @@
 #define MSHFAudioBufferSize 1024
 #define ASSPort 44333
 
-@interface NSUserDefaults (Private)
+@interface NSUserDefaults (mshfPrivate)
 - (instancetype)_initWithSuiteName:(NSString *)suiteName
                          container:(NSURL *)container;
 @end
