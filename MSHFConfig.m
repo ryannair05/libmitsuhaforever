@@ -2,6 +2,7 @@
 #import "public/MSHFUtils.h"
 #import <Cephei/HBPreferences.h>
 #import <ConorTheDev/libconorthedev.h>
+#import <libcolorpicker.h>
 
 @interface DarwinNotificationsManager : NSObject
 
@@ -80,8 +81,11 @@
   _view.sensitivity = self.sensitivity;
   _view.audioProcessing.fft = self.enableFFT;
   _view.disableBatterySaver = self.disableBatterySaver;
+  NSLog(@"[Mitsuha] self.waveColor: %@", self.waveColor);
+  NSLog(@"[Mitsuha] self.subwaveColor: %@", self.subwaveColor);
+  NSLog(@"[Mitsuha] self.colorMode: %d", self.colorMode);
 
-  if (self.colorMode == 2 && self.waveColor && self.subwaveColor) {
+  if (self.colorMode == 2 && self.waveColor) {
     [_view updateWaveColor:[self.waveColor copy]
               subwaveColor:[self.waveColor copy]];
   } else if (self.calculatedColor) {
@@ -94,11 +98,13 @@
   if (self.view == NULL)
     return;
   UIColor *color = self.waveColor;
-  CTDColorUtils *colorUtils = [[CTDColorUtils alloc] init];
-  color = [colorUtils getAverageColorFrom:image
+  if (self.colorMode != 2) {
+    CTDColorUtils *colorUtils = [[CTDColorUtils alloc] init];
+    color = [colorUtils getAverageColorFrom:image
                                 withAlpha:self.dynamicColorAlpha];
 
-  self.calculatedColor = color;
+    self.calculatedColor = color;
+  }
   [self.view updateWaveColor:[color copy] subwaveColor:[color copy]];
 }
 
@@ -127,6 +133,10 @@
   if ([dict objectForKey:@"waveColor"]) {
     if ([[dict objectForKey:@"waveColor"] isKindOfClass:[UIColor class]]) {
       _waveColor = [dict objectForKey:@"waveColor"];
+    } else if ([[dict objectForKey:@"waveColor"]
+                   isKindOfClass:[NSString class]]) {
+      _waveColor =
+          LCPParseColorString([dict objectForKey:@"waveColor"], @"#000000:0.5");
     } else {
       _waveColor = [[UIColor blackColor] colorWithAlphaComponent:0.5];
     }
@@ -137,6 +147,10 @@
   if ([dict objectForKey:@"subwaveColor"]) {
     if ([[dict objectForKey:@"subwaveColor"] isKindOfClass:[UIColor class]]) {
       _subwaveColor = [dict objectForKey:@"subwaveColor"];
+    } else if ([[dict objectForKey:@"subwaveColor"]
+                   isKindOfClass:[NSString class]]) {
+      _subwaveColor = LCPParseColorString([dict objectForKey:@"subwaveColor"],
+                                          @"#000000:0.5");
     } else {
       _subwaveColor = [[UIColor blackColor] colorWithAlphaComponent:0.5];
     }
@@ -172,31 +186,21 @@
   HBPreferences *file =
       [[HBPreferences alloc] initWithIdentifier:MSHFPreferencesIdentifier];
 
-  NSLog(@"[Mitsuha] Preferences: %@", file);
   for (NSString *key in [file.dictionaryRepresentation allKeys]) {
     [prefs setValue:[file objectForKey:key] forKey:key];
   }
 
   NSMutableDictionary *colors =
       [[NSMutableDictionary alloc] initWithContentsOfFile:MSHFColorsFile];
-  NSLog(@"[Mitsuha] Colors: %@", colors);
   for (NSString *key in [colors allKeys]) {
     [prefs setValue:[colors objectForKey:key] forKey:key];
   }
 
   for (NSString *key in [prefs allKeys]) {
-    NSString *removedKey = [key
-        stringByReplacingOccurrencesOfString:[NSString
-                                                 stringWithFormat:@"MSHF%@",
-                                                                  name]
-                                  withString:@""];
-    NSString *loweredFirstChar =
-        [[removedKey substringWithRange:NSMakeRange(0, 1)] lowercaseString];
-    NSString *newKey =
-        [removedKey stringByReplacingCharactersInRange:NSMakeRange(0, 1)
-                                            withString:loweredFirstChar];
+    NSString *removedKey = [key stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"MSHF%@", name] withString:@""];
+    NSString *lowerCaseKey = [NSString stringWithFormat:@"%@%@",[[removedKey substringToIndex:1] lowercaseString], [removedKey substringFromIndex:1]];
 
-    [prefs setValue:[prefs objectForKey:key] forKey:newKey];
+    [prefs setValue:[prefs objectForKey:key] forKey:lowerCaseKey];
   }
 
   prefs[@"gain"] = [prefs objectForKey:@"gain"] ?: @(50);

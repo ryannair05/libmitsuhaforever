@@ -1,11 +1,12 @@
 #import "public/MSHFView.h"
 #import "public/MSHFAudioSourceASS.h"
 #import "public/MSHFUtils.h"
+#import <Cephei/HBPreferences.h>
 #import <ConorTheDev/libconorthedev.h>
 
 @implementation MSHFView
 
-NSUserDefaults *userDefaults;
+HBPreferences *file;
 BOOL boost;
 
 - (instancetype)initWithFrame:(CGRect)frame {
@@ -49,11 +50,10 @@ BOOL boost;
     cachedLength = self.numberOfPoints;
     self.points = (CGPoint *)malloc(sizeof(CGPoint) * self.numberOfPoints);
 
-    NSUserDefaults *file = [[NSUserDefaults alloc]
-        _initWithSuiteName:@"me.conorthedev.mitsuhaforever"
-                 container:[NSURL URLWithString:@"/var/mobile"]];
+    file = [[HBPreferences alloc] initWithIdentifier:MSHFPreferencesIdentifier];
+
     [file registerDefaults:@{@"MSHFAirpodsSensBoost" : @NO}];
-    boost = [file boolForKey:@"MSHFAirpodsSensBoost"];
+    [file registerBool:&boost default:NO forKey:@"MSHFAirpodsSensBoost"];
   }
 
   return self;
