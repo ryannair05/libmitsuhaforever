@@ -2,7 +2,6 @@
 #import "public/MSHFAudioSourceASS.h"
 #import "public/MSHFUtils.h"
 #import <Cephei/HBPreferences.h>
-#import <ConorTheDev/libconorthedev.h>
 
 @implementation MSHFView
 

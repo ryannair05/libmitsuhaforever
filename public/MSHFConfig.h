@@ -45,6 +45,7 @@
 - (instancetype)initWithDictionary:(NSDictionary *)dict;
 
 + (MSHFConfig *)loadConfigForApplication:(NSString *)name;
+- (UIColor *)getAverageColorFrom:(UIImage *)image withAlpha:(double)alpha;
 - (void)colorizeView:(UIImage *)image;
 - (void)initializeViewWithFrame:(CGRect)frame;
 + (NSDictionary *)parseConfigForApplication:(NSString *)name;

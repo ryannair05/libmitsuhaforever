@@ -4,7 +4,7 @@
 #import "MSHFAudioSource.h"
 #import <UIKit/UIKit.h>
 
-#define MSHFPreferencesIdentifier @"me.conorthedev.mitsuhaforever"
+#define MSHFPreferencesIdentifier @"com.ryannair05.mitsuhaforever"
 
 @interface MSHFView : UIView <MSHFAudioDelegate, MSHFAudioProcessingDelegate> {
   NSUInteger cachedLength;

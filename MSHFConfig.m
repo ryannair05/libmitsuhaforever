@@ -1,7 +1,6 @@
 #import "public/MSHFConfig.h"
 #import "public/MSHFUtils.h"
 #import <Cephei/HBPreferences.h>
-#import <ConorTheDev/libconorthedev.h>
 #import <libcolorpicker.h>
 
 @interface DarwinNotificationsManager : NSObject
@@ -93,14 +92,30 @@
               subwaveColor:[self.calculatedColor copy]];
   }
 }
+- (UIColor *)getAverageColorFrom:(UIImage *)image withAlpha:(double)alpha {
+  CGSize size = {1, 1};
+  UIGraphicsBeginImageContext(size);
+  CGContextRef ctx = UIGraphicsGetCurrentContext();
+  CGContextSetInterpolationQuality(ctx, kCGInterpolationMedium);
 
+  [image drawInRect:(CGRect){.size = size} blendMode:kCGBlendModeCopy alpha:1];
+
+  uint8_t *data = (uint8_t *)CGBitmapContextGetData(ctx);
+
+  UIColor *color = [UIColor colorWithRed:data[2] / 255.0f
+                                   green:data[1] / 255.0f
+                                    blue:data[0] / 255.0f
+                                   alpha:alpha];
+
+  UIGraphicsEndImageContext();
+  return color;
+}
 - (void)colorizeView:(UIImage *)image {
   if (self.view == NULL)
     return;
   UIColor *color = self.waveColor;
   if (self.colorMode != 2) {
-    CTDColorUtils *colorUtils = [[CTDColorUtils alloc] init];
-    color = [colorUtils getAverageColorFrom:image
+    color = [self getAverageColorFrom:image
                                 withAlpha:self.dynamicColorAlpha];
 
     self.calculatedColor = color;

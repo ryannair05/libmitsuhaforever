@@ -8,15 +8,15 @@
 
 #import <Foundation/Foundation.h>
 
-#define MSHFPreferencesIdentifier @"me.conorthedev.mitsuhaforever"
-#define MSHFColorsIdentifier @"me.conorthedev.mitsuhaforever.colors"
-#define MSHFPreferencesChanged @"me.conorthedev.mitsuhaforever/ReloadPrefs"
+#define MSHFPreferencesIdentifier @"com.ryannair05.mitsuhaforever"
+#define MSHFColorsIdentifier @"com.ryannair05.mitsuhaforever.colors"
+#define MSHFPreferencesChanged @"com.ryannair05.mitsuhaforever/ReloadPrefs"
 #define MSHFPrefsFile                                                          \
   @"/var/mobile/Library/Preferences/"                                          \
-  @"me.conorthedev.mitsuhaforever.plist"
+  @"com.ryannair05.mitsuhaforever.plist"
 #define MSHFColorsFile                                                         \
   @"/var/mobile/Library/Preferences/"                                          \
-  @"me.conorthedev.mitsuhaforever.colors.plist"
+  @"com.ryannair05.mitsuhaforever.colors.plist"
 #define MSHFAppSpecifiersDirectory                                             \
   @"/Library/PreferenceBundles/MitsuhaForeverPrefs.bundle/Apps"
 #define SylphPreferencesFile                                                   \

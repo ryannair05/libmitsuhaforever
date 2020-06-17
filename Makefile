@@ -1,15 +1,16 @@
-ARCHS = armv7 arm64 arm64e
+FINALPACKAGE = 1
+
+export TARGET = iphone:13.5:11.0
+export ADDITIONAL_CFLAGS = -DTHEOS_LEAN_AND_MEAN -fobjc-arc
+
+ARCHS = arm64 arm64e
 
 include $(THEOS)/makefiles/common.mk
 
 LIBRARY_NAME = libmitsuhaforever
 $(LIBRARY_NAME)_OBJC_FILES = $(wildcard *.m)
-$(LIBRARY_NAME)_CFLAGS = -I./
-$(LIBRARY_NAME)_USE_MODULES = 0
-$(LIBRARY_NAME)_LIBRARIES = conorthedev colorpicker
+$(LIBRARY_NAME)_LIBRARIES = colorpicker
 $(LIBRARY_NAME)_EXTRA_FRAMEWORKS += Cephei
-
-ADDITIONAL_CFLAGS = -Ipublic -Ioverlayheaders -I. -fobjc-arc
 
 include $(THEOS_MAKE_PATH)/library.mk
 
