@@ -136,9 +136,11 @@ BOOL boost;
 }
 
 - (void)setSampleData:(float *)data length:(int)length {
-  NSUInteger compressionRate = length / self.numberOfPoints;
+  NSUInteger const compressionRate = length / self.numberOfPoints;
 
-  float pixelFixer = self.bounds.size.width / self.numberOfPoints;
+  float const pixelFixer = self.bounds.size.width / self.numberOfPoints;
+
+  bool const isAppleMusic = [@"Music" isEqualToString:[NSProcessInfo processInfo].processName];
 
   if (cachedLength != self.numberOfPoints) {
     free(self.points);
@@ -157,8 +159,12 @@ BOOL boost;
     }
 
     if (boost) {
-      self.points[i].y = 25 + self.waveOffset;
-    } else {
+      if (isAppleMusic)
+        self.points[i].y = pow(pureValue, self.sensitivity) + self.waveOffset;
+      else 
+        self.points[i].y = 25 + self.waveOffset;
+    } 
+    else { 
       self.points[i].y = (pureValue * self.sensitivity) + self.waveOffset;
     }
 
