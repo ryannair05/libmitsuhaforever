@@ -2,6 +2,7 @@
 #import "MSHFDotView.h"
 #import "MSHFJelloView.h"
 #import "MSHFLineView.h"
+#import "MSHFSiriView.h"
 #import "MSHFView.h"
 
 @interface MSHFConfig : NSObject
@@ -22,6 +23,7 @@
 
 @property(nonatomic, strong) UIColor *waveColor;
 @property(nonatomic, strong) UIColor *subwaveColor;
+@property(nonatomic, strong) UIColor *subSubwaveColor;
 @property(nonatomic, strong) UIColor *calculatedColor;
 
 @property NSUInteger numberOfPoints;
