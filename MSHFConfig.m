@@ -88,12 +88,16 @@
   NSLog(@"[Mitsuha] self.subSubwaveColor: %@", self.subSubwaveColor);
   NSLog(@"[Mitsuha] self.colorMode: %d", self.colorMode);
 
-  if (self.colorMode == 0 && self.waveColor && self.subwaveColor) {
-    [_view updateWaveColor:[self.waveColor copy] subwaveColor:[self.waveColor copy]];
-  } else if (self.calculatedColor) {
-    [_view updateWaveColor:[self.calculatedColor copy] subwaveColor:[self.calculatedColor copy] subSubwaveColor:[self.calculatedColor copy]];
+  if (self.colorMode == 2 && self.waveColor) {
+    [_view updateWaveColor:[self.waveColor copy]
+              subwaveColor:[self.waveColor copy]];
   } else if (self.colorMode == 1 && self.waveColor && self.subwaveColor && self.subSubwaveColor) {
-    [_view updateWaveColor:[self.waveColor copy] subwaveColor:[self.waveColor copy] subSubwaveColor:[self.waveColor copy]];
+    [_view updateWaveColor:[self.waveColor copy]
+              subwaveColor:[self.waveColor copy]
+           subSubwaveColor:[self.waveColor copy]];
+  } else if (self.calculatedColor) {
+    [_view updateWaveColor:[self.calculatedColor copy]
+              subwaveColor:[self.calculatedColor copy]];
   }
 }
 - (UIColor *)getAverageColorFrom:(UIImage *)image withAlpha:(double)alpha {
@@ -121,20 +125,40 @@
   UIColor *scolor = self.waveColor;
   UIColor *sscolor = self.waveColor;
   if (self.colorMode == 1 && self.style == 4) {
-    color = [UIColor colorWithRed:1.0f green:0.0f blue:0.0f alpha:self.dynamicColorAlpha];
-    scolor = [UIColor colorWithRed:0.0f green:1.0f blue:0.0f alpha:self.dynamicColorAlpha];
-    sscolor = [UIColor colorWithRed:0.0f green:0.0f blue:1.0f alpha:self.dynamicColorAlpha];
+    color = [UIColor colorWithRed:1.0f
+                            green:0.0f
+                             blue:0.0f
+                            alpha:self.dynamicColorAlpha];
+    scolor = [UIColor colorWithRed:0.0f
+                             green:1.0f
+                              blue:0.0f
+                             alpha:self.dynamicColorAlpha];
+    sscolor = [UIColor colorWithRed:0.0f
+                              green:0.0f
+                               blue:1.0f
+                              alpha:self.dynamicColorAlpha];
+  } else if (self.colorMode == 2) { // placeholder for custom color
+    color = [self getAverageColorFrom:image
+                            withAlpha:self.dynamicColorAlpha];
   } else {
     color = [self getAverageColorFrom:image
                             withAlpha:self.dynamicColorAlpha];
   }
   self.calculatedColor = color;
   if (self.colorMode == 1 && self.style == 4) {
-    [self.view updateWaveColor:[color copy] subwaveColor:[scolor copy] subSubwaveColor:[sscolor copy]];
+    [self.view updateWaveColor:[color copy]
+                  subwaveColor:[scolor copy]
+               subSubwaveColor:[sscolor copy]];
   } else if (self.colorMode != 1 && self.style == 4) {
-    [self.view updateWaveColor:[color copy] subwaveColor:[color copy] subSubwaveColor:[color copy]];
+    [self.view updateWaveColor:[color copy]
+                  subwaveColor:[color copy]
+               subSubwaveColor:[color copy]];
+  } else if (self.colorMode == 2) { // placeholder for custom color
+    [self.view updateWaveColor:[color copy]
+                  subwaveColor:[color copy]];
   } else {
-    [self.view updateWaveColor:[color copy] subwaveColor:[color copy]];
+    [self.view updateWaveColor:[color copy]
+                  subwaveColor:[color copy]];
   }
 }
 
@@ -180,6 +204,20 @@
     } else if ([[dict objectForKey:@"subwaveColor"]
                    isKindOfClass:[NSString class]]) {
       _subwaveColor = LCPParseColorString([dict objectForKey:@"subwaveColor"],
+                                          @"#000000:0.5");
+    } else {
+      _subwaveColor = [[UIColor blackColor] colorWithAlphaComponent:0.5];
+    }
+  } else {
+    _subwaveColor = [[UIColor blackColor] colorWithAlphaComponent:0.5];
+  }
+  
+  if ([dict objectForKey:@"subSubwaveColor"]) {
+    if ([[dict objectForKey:@"subSubwaveColor"] isKindOfClass:[UIColor class]]) {
+      _subwaveColor = [dict objectForKey:@"subSubwaveColor"];
+    } else if ([[dict objectForKey:@"subSubwaveColor"]
+                   isKindOfClass:[NSString class]]) {
+      _subwaveColor = LCPParseColorString([dict objectForKey:@"subSubwaveColor"],
                                           @"#000000:0.5");
     } else {
       _subwaveColor = [[UIColor blackColor] colorWithAlphaComponent:0.5];
