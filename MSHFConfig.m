@@ -89,8 +89,14 @@
   NSLog(@"[Mitsuha] self.colorMode: %d", self.colorMode);
 
   if (self.colorMode == 2 && self.waveColor) {
-    [_view updateWaveColor:[self.waveColor copy]
-              subwaveColor:[self.waveColor copy]];
+    if (self.style == 4) {
+      [_view updateWaveColor:[self.waveColor copy]
+                subwaveColor:[self.waveColor copy]
+             subSubwaveColor:[self.waveColor copy]];
+    } else {
+      [_view updateWaveColor:[self.waveColor copy]
+                subwaveColor:[self.waveColor copy]];
+    }
   } else if (self.colorMode == 1 && self.waveColor && self.subwaveColor && self.subSubwaveColor) {
     [_view updateWaveColor:[self.waveColor copy]
               subwaveColor:[self.waveColor copy]
