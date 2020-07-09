@@ -128,43 +128,51 @@
   if (self.view == NULL)
     return;
   UIColor *color = self.waveColor;
-  UIColor *scolor = self.waveColor;
-  UIColor *sscolor = self.waveColor;
-  if (self.colorMode == 1 && self.style == 4) {
-    color = [UIColor colorWithRed:1.0f
-                            green:0.0f
-                             blue:0.0f
-                            alpha:self.dynamicColorAlpha];
-    scolor = [UIColor colorWithRed:0.0f
-                             green:1.0f
-                              blue:0.0f
-                             alpha:self.dynamicColorAlpha];
-    sscolor = [UIColor colorWithRed:0.0f
+  if (self.colorMode != 2) {
+    
+    UIColor *scolor = self.waveColor;
+    UIColor *sscolor = self.waveColor;
+    
+    if (self.colorMode == 1 && self.style == 4) {
+      color = [UIColor colorWithRed:1.0f
                               green:0.0f
-                               blue:1.0f
+                              blue:0.0f
                               alpha:self.dynamicColorAlpha];
-  } else if (self.colorMode == 2) { // placeholder for custom color
-    color = [self getAverageColorFrom:image
-                            withAlpha:self.dynamicColorAlpha];
+      scolor = [UIColor colorWithRed:0.0f
+                              green:1.0f
+                                blue:0.0f
+                              alpha:self.dynamicColorAlpha];
+      sscolor = [UIColor colorWithRed:0.0f
+                                green:0.0f
+                                blue:1.0f
+                                alpha:self.dynamicColorAlpha];
+    } else {
+      color = [self getAverageColorFrom:image
+                              withAlpha:self.dynamicColorAlpha];
+      self.calculatedColor = color;
+    }
+    
+    if (self.colorMode == 1 && self.style == 4) {
+      [self.view updateWaveColor:[color copy]
+                    subwaveColor:[scolor copy]
+                subSubwaveColor:[sscolor copy]];
+    } else if (self.colorMode != 1 && self.style == 4) {
+      [self.view updateWaveColor:[color copy]
+                    subwaveColor:[color copy]
+                subSubwaveColor:[color copy]];
+    }  else {
+      [self.view updateWaveColor:[color copy]
+                    subwaveColor:[color copy]];
+    }
   } else {
-    color = [self getAverageColorFrom:image
-                            withAlpha:self.dynamicColorAlpha];
-  }
-  self.calculatedColor = color;
-  if (self.colorMode == 1 && self.style == 4) {
-    [self.view updateWaveColor:[color copy]
-                  subwaveColor:[scolor copy]
-               subSubwaveColor:[sscolor copy]];
-  } else if (self.colorMode != 1 && self.style == 4) {
-    [self.view updateWaveColor:[color copy]
-                  subwaveColor:[color copy]
-               subSubwaveColor:[color copy]];
-  } else if (self.colorMode == 2) { // placeholder for custom color
-    [self.view updateWaveColor:[color copy]
-                  subwaveColor:[color copy]];
-  } else {
-    [self.view updateWaveColor:[color copy]
-                  subwaveColor:[color copy]];
+    if (self.style == 4) {
+      [_view updateWaveColor:[color copy]
+                subwaveColor:[color copy]
+             subSubwaveColor:[color copy]];
+    } else {
+      [_view updateWaveColor:[color copy]
+                subwaveColor:[color copy]];
+    }
   }
 }
 
