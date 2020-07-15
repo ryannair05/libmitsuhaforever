@@ -1,4 +1,4 @@
-#import "public/MSHFJelloView.h"
+#import "public/MSHFSiriJelloView.h"
 
 static CGPoint midPointForPoints(CGPoint p1, CGPoint p2) {
   return CGPointMake((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
@@ -16,29 +16,33 @@ static CGPoint controlPointForPoints(CGPoint p1, CGPoint p2) {
   return controlPoint;
 }
 
-@implementation MSHFJelloView
+@implementation MSHFSiriJelloView
 
 - (void)initializeWaveLayers {
   self.waveLayer = [MSHFJelloLayer layer];
   self.subwaveLayer = [MSHFJelloLayer layer];
+  self.subSubwaveLayer = [MSHFJelloLayer layer];
 
-  self.waveLayer.frame = self.subwaveLayer.frame = self.bounds;
+  self.waveLayer.frame = self.subwaveLayer.frame = self.subSubwaveLayer.frame = self.bounds;
 
   [self.layer addSublayer:self.waveLayer];
   [self.layer addSublayer:self.subwaveLayer];
+  [self.layer addSublayer:self.subSubwaveLayer];
 
   self.waveLayer.zPosition = 0;
   self.subwaveLayer.zPosition = -1;
+  self.subSubwaveLayer.zPosition = -2;
 
   [self configureDisplayLink];
   [self resetWaveLayers];
 
   self.waveLayer.shouldAnimate = true;
   self.subwaveLayer.shouldAnimate = true;
+  self.subSubwaveLayer.shouldAnimate = true;
 }
 
 - (void)resetWaveLayers {
-  if (!self.waveLayer || !self.subwaveLayer) {
+  if (!self.waveLayer || !self.subwaveLayer || !self.subSubwaveLayer) {
     [self initializeWaveLayers];
   }
 
@@ -50,14 +54,21 @@ static CGPoint controlPointForPoints(CGPoint p1, CGPoint p2) {
 
   self.waveLayer.path = path;
   self.subwaveLayer.path = path;
+  self.subSubwaveLayer.path = path;
 }
 
 - (void)updateWaveColor:(UIColor *)waveColor
-           subwaveColor:(UIColor *)subwaveColor {
+           subwaveColor:(UIColor *)subwaveColor
+        subSubwaveColor:(UIColor *)subSubwaveColor {
   self.waveColor = waveColor;
   self.subwaveColor = subwaveColor;
+  self.subSubwaveColor = subSubwaveColor;
   self.waveLayer.fillColor = waveColor.CGColor;
   self.subwaveLayer.fillColor = subwaveColor.CGColor;
+  self.subSubwaveLayer.fillColor = subSubwaveColor.CGColor;
+  self.waveLayer.compositingFilter = @"screenBlendMode";
+  self.subwaveLayer.compositingFilter = @"screenBlendMode";
+  self.subSubwaveLayer.compositingFilter = @"screenBlendMode";
 }
 
 - (void)redraw {
@@ -72,6 +83,12 @@ static CGPoint controlPointForPoints(CGPoint p1, CGPoint p2) {
       dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)),
       dispatch_get_main_queue(), ^{
         self.subwaveLayer.path = path;
+      });
+  
+  dispatch_after(
+      dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.50 * NSEC_PER_SEC)),
+      dispatch_get_main_queue(), ^{
+        self.subSubwaveLayer.path = path;
         CGPathRelease(path);
       });
 }

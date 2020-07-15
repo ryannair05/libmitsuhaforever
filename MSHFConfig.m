@@ -41,25 +41,48 @@
     [_view removeFromSuperview];
   }
 
-  switch (_style) {
-  case 1:
-    self.view = [[MSHFBarView alloc] initWithFrame:frame];
-    [((MSHFBarView *)_view) setBarSpacing:self.barSpacing];
-    [((MSHFBarView *)_view) setBarCornerRadius:self.barCornerRadius];
-    break;
-  case 2:
-    self.view = [[MSHFLineView alloc] initWithFrame:frame];
-    [((MSHFLineView *)_view) setLineThickness:self.lineThickness];
-    break;
-  case 3:
-    self.view = [[MSHFDotView alloc] initWithFrame:frame];
-    [((MSHFDotView *)_view) setBarSpacing:self.barSpacing];
-    break;
-  case 4:
-    self.view = [[MSHFSiriView alloc] initWithFrame:frame];
-    break;
-  default:
-    self.view = [[MSHFJelloView alloc] initWithFrame:frame];
+  if (_colorMode != 1) {
+    switch (_style) {
+    case 1:
+      self.view = [[MSHFBarView alloc] initWithFrame:frame];
+      [((MSHFBarView *)_view) setBarSpacing:self.barSpacing];
+      [((MSHFBarView *)_view) setBarCornerRadius:self.barCornerRadius];
+      break;
+    case 2:
+      self.view = [[MSHFLineView alloc] initWithFrame:frame];
+      [((MSHFLineView *)_view) setLineThickness:self.lineThickness];
+      break;
+    case 3:
+      self.view = [[MSHFDotView alloc] initWithFrame:frame];
+      [((MSHFDotView *)_view) setBarSpacing:self.barSpacing];
+      break;
+    case 4:
+      self.view = [[MSHFSiriView alloc] initWithFrame:frame];
+      break;
+    default:
+      self.view = [[MSHFJelloView alloc] initWithFrame:frame];
+    }
+  } else {
+    switch (_style) {
+    case 1:
+      self.view = [[MSHFSiriBarView alloc] initWithFrame:frame];
+      [((MSHFSiriBarView *)_view) setBarSpacing:self.barSpacing];
+      [((MSHFSiriBarView *)_view) setBarCornerRadius:self.barCornerRadius];
+      break;
+    case 2:
+      self.view = [[MSHFSiriLineView alloc] initWithFrame:frame];
+      [((MSHFSiriLineView *)_view) setLineThickness:self.lineThickness];
+      break;
+    case 3:
+      self.view = [[MSHFSiriDotView alloc] initWithFrame:frame];
+      [((MSHFSiriDotView *)_view) setBarSpacing:self.barSpacing];
+      break;
+    case 4:
+      self.view = [[MSHFSiriView alloc] initWithFrame:frame];
+      break;
+    default:
+      self.view = [[MSHFSiriJelloView alloc] initWithFrame:frame];
+    }
   }
 
   if (superview) {
@@ -99,8 +122,8 @@
     }
   } else if (self.colorMode == 1 && self.waveColor && self.subwaveColor && self.subSubwaveColor) {
     [_view updateWaveColor:[self.waveColor copy]
-              subwaveColor:[self.waveColor copy]
-           subSubwaveColor:[self.waveColor copy]];
+              subwaveColor:[self.subwaveColor copy]
+           subSubwaveColor:[self.subSubwaveColor copy]];
   } else if (self.calculatedColor) {
     [_view updateWaveColor:[self.calculatedColor copy]
               subwaveColor:[self.calculatedColor copy]];
@@ -133,7 +156,7 @@
     UIColor *scolor = self.waveColor;
     UIColor *sscolor = self.waveColor;
     
-    if (self.colorMode == 1 && self.style == 4) {
+    if (self.colorMode == 1) {
       color = [UIColor colorWithRed:1.0f
                               green:0.0f
                               blue:0.0f
@@ -152,7 +175,7 @@
       self.calculatedColor = color;
     }
     
-    if (self.colorMode == 1 && self.style == 4) {
+    if (self.colorMode == 1) {
       [self.view updateWaveColor:[color copy]
                     subwaveColor:[scolor copy]
                 subSubwaveColor:[sscolor copy]];
