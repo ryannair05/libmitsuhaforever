@@ -6,6 +6,7 @@
 
 @property(nonatomic, strong) MSHFJelloLayer *waveLayer;
 @property(nonatomic, strong) MSHFJelloLayer *subwaveLayer;
+@property(nonatomic, strong) MSHFJelloLayer *subSubwaveLayer;
 
 - (CGPathRef)createPathWithPoints:(CGPoint *)points
                        pointCount:(NSUInteger)pointCount

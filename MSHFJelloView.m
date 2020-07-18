@@ -19,27 +19,45 @@ static CGPoint controlPointForPoints(CGPoint p1, CGPoint p2) {
 @implementation MSHFJelloView
 
 - (void)initializeWaveLayers {
+  self.layer.sublayers = nil;
   self.waveLayer = [MSHFJelloLayer layer];
   self.subwaveLayer = [MSHFJelloLayer layer];
 
-  self.waveLayer.frame = self.subwaveLayer.frame = self.bounds;
+  if (!self.siriEnabled) self.waveLayer.frame = self.subwaveLayer.frame = self.bounds;
 
   [self.layer addSublayer:self.waveLayer];
   [self.layer addSublayer:self.subwaveLayer];
 
   self.waveLayer.zPosition = 0;
   self.subwaveLayer.zPosition = -1;
+  
+  if (self.siriEnabled) {
+    self.subSubwaveLayer = [MSHFJelloLayer layer];
+    
+    self.waveLayer.frame = self.subwaveLayer.frame = self.subSubwaveLayer.frame = self.bounds;
+    
+    [self.layer addSublayer:self.subSubwaveLayer];
+    
+    self.subSubwaveLayer.zPosition = -2;
+  }
 
   [self configureDisplayLink];
   [self resetWaveLayers];
 
   self.waveLayer.shouldAnimate = true;
   self.subwaveLayer.shouldAnimate = true;
+  if (self.siriEnabled) self.subSubwaveLayer.shouldAnimate = true;
 }
 
 - (void)resetWaveLayers {
-  if (!self.waveLayer || !self.subwaveLayer) {
-    [self initializeWaveLayers];
+  if (!self.siriEnabled) {
+    if (!self.waveLayer || !self.subwaveLayer) {
+      [self initializeWaveLayers];
+    }
+  } else {
+    if (!self.waveLayer || !self.subwaveLayer || !self.subSubwaveLayer) {
+      [self initializeWaveLayers];
+    }
   }
 
   CGPathRef path = [self createPathWithPoints:self.points
@@ -50,6 +68,7 @@ static CGPoint controlPointForPoints(CGPoint p1, CGPoint p2) {
 
   self.waveLayer.path = path;
   self.subwaveLayer.path = path;
+  if (self.siriEnabled) self.subSubwaveLayer.path = path;
 }
 
 - (void)updateWaveColor:(UIColor *)waveColor
@@ -58,6 +77,24 @@ static CGPoint controlPointForPoints(CGPoint p1, CGPoint p2) {
   self.subwaveColor = subwaveColor;
   self.waveLayer.fillColor = waveColor.CGColor;
   self.subwaveLayer.fillColor = subwaveColor.CGColor;
+}
+
+- (void)updateWaveColor:(UIColor *)waveColor
+           subwaveColor:(UIColor *)subwaveColor
+        subSubwaveColor:(UIColor *)subSubwaveColor {
+  if (!self.waveLayer || !self.subwaveLayer || !self.subSubwaveLayer) {
+    [self initializeWaveLayers];
+  }
+  
+  self.waveColor = waveColor;
+  self.subwaveColor = subwaveColor;
+  self.subSubwaveColor = subSubwaveColor;
+  self.waveLayer.fillColor = waveColor.CGColor;
+  self.subwaveLayer.fillColor = subwaveColor.CGColor;
+  self.subSubwaveLayer.fillColor = subSubwaveColor.CGColor;
+  self.waveLayer.compositingFilter = @"screenBlendMode";
+  self.subwaveLayer.compositingFilter = @"screenBlendMode";
+  self.subSubwaveLayer.compositingFilter = @"screenBlendMode";
 }
 
 - (void)redraw {
@@ -72,8 +109,17 @@ static CGPoint controlPointForPoints(CGPoint p1, CGPoint p2) {
       dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)),
       dispatch_get_main_queue(), ^{
         self.subwaveLayer.path = path;
-        CGPathRelease(path);
+        if (!self.siriEnabled) CGPathRelease(path);
       });
+  
+  if (self.siriEnabled) {
+    dispatch_after(
+        dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.50 * NSEC_PER_SEC)),
+        dispatch_get_main_queue(), ^{
+          self.subSubwaveLayer.path = path;
+          CGPathRelease(path);
+        });
+  }
 }
 
 - (void)setSampleData:(float *)data length:(int)length {

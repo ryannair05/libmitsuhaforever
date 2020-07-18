@@ -2,10 +2,6 @@
 #import "MSHFDotView.h"
 #import "MSHFJelloView.h"
 #import "MSHFLineView.h"
-#import "MSHFSiriBarView.h"
-#import "MSHFSiriDotView.h"
-#import "MSHFSiriJelloView.h"
-#import "MSHFSiriLineView.h"
 #import "MSHFSiriView.h"
 #import "MSHFView.h"
 

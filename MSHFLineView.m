@@ -3,30 +3,60 @@
 @implementation MSHFLineView
 
 - (void)initializeWaveLayers {
+  self.layer.sublayers = nil;
   self.waveLayer = [MSHFJelloLayer layer];
 
-  self.waveLayer.frame = self.bounds;
+  if (!self.siriEnabled) self.waveLayer.frame = self.bounds;
 
   [self.layer addSublayer:self.waveLayer];
 
   self.waveLayer.zPosition = 0;
   self.waveLayer.lineWidth = 5;
   self.waveLayer.fillColor = [UIColor clearColor].CGColor;
+  
+  if (self.siriEnabled) {
+    self.subwaveLayer = [MSHFJelloLayer layer];
+    self.subSubwaveLayer = [MSHFJelloLayer layer];
+
+    self.waveLayer.frame = self.subwaveLayer.frame = self.subSubwaveLayer.frame = self.bounds;
+
+    [self.layer addSublayer:self.subwaveLayer];
+    [self.layer addSublayer:self.subSubwaveLayer];
+
+    self.subwaveLayer.zPosition = -1;
+    self.subSubwaveLayer.zPosition = -2;
+    self.subwaveLayer.lineWidth = 5;
+    self.subSubwaveLayer.lineWidth = 5;
+    self.subwaveLayer.fillColor = [UIColor clearColor].CGColor;
+    self.subSubwaveLayer.fillColor = [UIColor clearColor].CGColor;
+  }
 
   [self configureDisplayLink];
   [self resetWaveLayers];
 
   self.waveLayer.shouldAnimate = true;
+  if (self.siriEnabled) {
+    self.subwaveLayer.shouldAnimate = true;
+    self.subSubwaveLayer.shouldAnimate = true;
+  }
 }
 
 - (void)setLineThickness:(CGFloat)thickness {
   _lineThickness = thickness;
   self.waveLayer.lineWidth = thickness;
+  self.subwaveLayer.lineWidth = thickness;
+  self.subSubwaveLayer.lineWidth = thickness;
 }
 
 - (void)resetWaveLayers {
-  if (!self.waveLayer) {
-    [self initializeWaveLayers];
+  if (!self.siriEnabled) {
+    if (!self.waveLayer) {
+      [self initializeWaveLayers];
+    }
+  } else {
+    if (!self.waveLayer || !self.subwaveLayer || !self.subSubwaveLayer) {
+      [self initializeWaveLayers];
+    }
   }
 
   CGPathRef path = [self createPathWithPoints:self.points
@@ -36,6 +66,10 @@
   NSLog(@"[libmitsuha]: Resetting Wave Layers...");
 
   self.waveLayer.path = path;
+  if (self.siriEnabled) {
+    self.subwaveLayer.path = path;
+    self.subSubwaveLayer.path = path;
+  }
 }
 
 - (void)updateWaveColor:(UIColor *)waveColor
@@ -45,6 +79,24 @@
   self.waveLayer.strokeColor = waveColor.CGColor;
 }
 
+- (void)updateWaveColor:(UIColor *)waveColor
+           subwaveColor:(UIColor *)subwaveColor
+        subSubwaveColor:(UIColor *)subSubwaveColor {
+  if (!self.waveLayer || !self.subwaveLayer || !self.subSubwaveLayer) {
+    [self initializeWaveLayers];
+  }
+  
+  self.waveColor = waveColor;
+  self.subwaveColor = subwaveColor;
+  self.subSubwaveColor = subSubwaveColor;
+  self.waveLayer.strokeColor = waveColor.CGColor;
+  self.subwaveLayer.strokeColor = subwaveColor.CGColor;
+  self.subSubwaveLayer.strokeColor = subSubwaveColor.CGColor;
+  self.waveLayer.compositingFilter = @"screenBlendMode";
+  self.subwaveLayer.compositingFilter = @"screenBlendMode";
+  self.subSubwaveLayer.compositingFilter = @"screenBlendMode";
+}
+
 - (void)redraw {
   [super redraw];
 
@@ -52,6 +104,21 @@
                                    pointCount:self.numberOfPoints
                                        inRect:self.bounds];
   self.waveLayer.path = path;
+  
+  if (self.siriEnabled) {
+    dispatch_after(
+        dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)),
+        dispatch_get_main_queue(), ^{
+          self.subwaveLayer.path = path;
+        });
+    
+    dispatch_after(
+        dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.50 * NSEC_PER_SEC)),
+        dispatch_get_main_queue(), ^{
+          self.subSubwaveLayer.path = path;
+          CGPathRelease(path);
+        });
+  }
 }
 
 - (void)setSampleData:(float *)data length:(int)length {
