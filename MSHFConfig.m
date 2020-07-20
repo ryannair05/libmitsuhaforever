@@ -87,6 +87,12 @@
   NSLog(@"[Mitsuha] self.subwaveColor: %@", self.subwaveColor);
   NSLog(@"[Mitsuha] self.subSubwaveColor: %@", self.subSubwaveColor);
   NSLog(@"[Mitsuha] self.colorMode: %d", self.colorMode);
+  
+  if (self.colorMode == 1) {
+    _view.siriEnabled = true;
+  } else {
+    _view.siriEnabled = false;
+  }
 
   if (self.colorMode == 2 && self.waveColor) {
     if (self.style == 4) {
@@ -99,8 +105,8 @@
     }
   } else if (self.colorMode == 1 && self.waveColor && self.subwaveColor && self.subSubwaveColor) {
     [_view updateWaveColor:[self.waveColor copy]
-              subwaveColor:[self.waveColor copy]
-           subSubwaveColor:[self.waveColor copy]];
+              subwaveColor:[self.subwaveColor copy]
+           subSubwaveColor:[self.subSubwaveColor copy]];
   } else if (self.calculatedColor) {
     [_view updateWaveColor:[self.calculatedColor copy]
               subwaveColor:[self.calculatedColor copy]];
@@ -133,7 +139,7 @@
     UIColor *scolor = self.waveColor;
     UIColor *sscolor = self.waveColor;
     
-    if (self.colorMode == 1 && self.style == 4) {
+    if (self.colorMode == 1) {
       color = [UIColor colorWithRed:1.0f
                               green:0.0f
                               blue:0.0f
@@ -152,7 +158,7 @@
       self.calculatedColor = color;
     }
     
-    if (self.colorMode == 1 && self.style == 4) {
+    if (self.colorMode == 1) {
       [self.view updateWaveColor:[color copy]
                     subwaveColor:[scolor copy]
                 subSubwaveColor:[sscolor copy]];

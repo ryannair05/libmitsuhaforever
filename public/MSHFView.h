@@ -31,6 +31,8 @@
 @property(nonatomic, strong) CADisplayLink *displayLink;
 @property(nonatomic, assign) CGPoint *points;
 
+@property(nonatomic, assign) BOOL siriEnabled;
+
 @property(nonatomic, strong) UIColor *calculatedColor;
 @property(nonatomic, strong) UIColor *waveColor;
 @property(nonatomic, strong) UIColor *subwaveColor;
