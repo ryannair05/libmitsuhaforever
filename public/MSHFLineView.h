@@ -1,6 +1,5 @@
 #import "MSHFJelloLayer.h"
 #import "MSHFView.h"
-#import <UIKit/UIKit.h>
 
 @interface MSHFLineView : MSHFView
 

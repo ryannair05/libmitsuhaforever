@@ -1,5 +1,4 @@
 #import "MSHFView.h"
-#import <UIKit/UIKit.h>
 
 @interface MSHFBarView : MSHFView
 

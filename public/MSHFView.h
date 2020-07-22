@@ -66,3 +66,8 @@
                   audioSource:(MSHFAudioSource *)audioSource;
 
 @end
+
+@interface BluetoothManager
++ (id)sharedInstance;
+- (id)connectedDevices;
+@end

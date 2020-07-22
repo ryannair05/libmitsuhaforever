@@ -10,7 +10,6 @@ include $(THEOS)/makefiles/common.mk
 LIBRARY_NAME = libmitsuhaforever
 $(LIBRARY_NAME)_OBJC_FILES = $(wildcard *.m)
 $(LIBRARY_NAME)_LIBRARIES = colorpicker
-$(LIBRARY_NAME)_EXTRA_FRAMEWORKS += Cephei
 
 include $(THEOS_MAKE_PATH)/library.mk
 

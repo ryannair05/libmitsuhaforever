@@ -1,11 +1,9 @@
 #import "public/MSHFView.h"
 #import "public/MSHFAudioSourceASS.h"
 #import "public/MSHFUtils.h"
-#import <Cephei/HBPreferences.h>
 
 @implementation MSHFView
 
-HBPreferences *file;
 BOOL boost;
 
 - (instancetype)initWithFrame:(CGRect)frame {
@@ -49,10 +47,8 @@ BOOL boost;
     cachedLength = self.numberOfPoints;
     self.points = (CGPoint *)malloc(sizeof(CGPoint) * self.numberOfPoints);
 
-    file = [[HBPreferences alloc] initWithIdentifier:MSHFPreferencesIdentifier];
-
-    [file registerDefaults:@{@"MSHFAirpodsSensBoost" : @NO}];
-    [file registerBool:&boost default:NO forKey:@"MSHFAirpodsSensBoost"];
+    NSDictionary *prefs = [[NSDictionary alloc] initWithContentsOfFile:MSHFPrefsFile];
+    boost = ([prefs objectForKey:@"MSHFAirpodsSensBoost"] ? [[prefs objectForKey:@"MSHFAirpodsSensBoost"] boolValue] : NO);
   }
 
   return self;
@@ -145,7 +141,6 @@ BOOL boost;
 
   float const pixelFixer = self.bounds.size.width / self.numberOfPoints;
 
-  bool const isAppleMusic = [@"Music" isEqualToString:[NSProcessInfo processInfo].processName];
 
   if (cachedLength != self.numberOfPoints) {
     free(self.points);
@@ -153,28 +148,51 @@ BOOL boost;
     cachedLength = self.numberOfPoints;
   }
 
-  for (int i = 0; i < self.numberOfPoints; i++) {
-    self.points[i].x = i * pixelFixer;
-    double pureValue = data[i * compressionRate] * self.gain;
+  if ([[[NSClassFromString(@"BluetoothManager") sharedInstance] connectedDevices] count] && boost) {
 
-    if (self.limiter != 0) {
-      pureValue = (fabs(pureValue) < self.limiter
-                       ? pureValue
-                       : (pureValue < 0 ? -1 * self.limiter : self.limiter));
-    }
+    for (int i = 0; i < self.numberOfPoints; i++) {
+        self.points[i].x = i * pixelFixer;
+        double pureValue = data[i * compressionRate] * self.gain;
 
-    if (boost) {
-      if (isAppleMusic)
-        self.points[i].y = pow(pureValue, self.sensitivity) + self.waveOffset;
-      else 
-        self.points[i].y = 25 + self.waveOffset;
-    } 
-    else { 
+        if (self.limiter != 0) {
+          pureValue = (fabs(pureValue) < self.limiter
+                          ? pureValue
+                          : (pureValue < 0 ? -1 * self.limiter : self.limiter));
+        }
+
+        self.points[i].y = (pureValue * self.sensitivity * 20);
+        
+        if (!self.points[i].y)
+          continue;
+
+        if (fabs(self.points[i].y) < 1) {
+            self.points[i].y /= 100;
+        }
+
+        if (fabs(self.points[i].y) < 5) {
+            self.points[i].y *= 5;
+        }
+
+        
+        self.points[i].y += self.waveOffset;
+      }
+  } else {
+
+    for (int i = 0; i < self.numberOfPoints; i++) {
+      self.points[i].x = i * pixelFixer;
+      double pureValue = data[i * compressionRate] * self.gain;
+
+      if (self.limiter != 0) {
+        pureValue = (fabs(pureValue) < self.limiter
+                        ? pureValue
+                        : (pureValue < 0 ? -1 * self.limiter : self.limiter));
+      }
+
       self.points[i].y = (pureValue * self.sensitivity) + self.waveOffset;
+      
+      if (isnan(self.points[i].y))
+        self.points[i].y = 0;
     }
-
-    if (isnan(self.points[i].y))
-      self.points[i].y = 0;
   }
 }
 

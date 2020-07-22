@@ -1,6 +1,6 @@
 Package: com.ryannair05.libmitsuhaforever
 Name: libmitsuhaforever
-Version: 1.3.2
+Version: 1.3.3
 Architecture: iphoneos-arm
 Description: An advanced audio visualizer library for Mitsuha Forever
 Maintainer: Ryan Nair

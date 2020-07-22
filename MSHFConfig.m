@@ -1,6 +1,5 @@
 #import "public/MSHFConfig.h"
 #import "public/MSHFUtils.h"
-#import <Cephei/HBPreferences.h>
 #import <libcolorpicker.h>
 
 @interface DarwinNotificationsManager : NSObject
@@ -88,11 +87,7 @@
   NSLog(@"[Mitsuha] self.subSubwaveColor: %@", self.subSubwaveColor);
   NSLog(@"[Mitsuha] self.colorMode: %d", self.colorMode);
   
-  if (self.colorMode == 1) {
-    _view.siriEnabled = true;
-  } else {
-    _view.siriEnabled = false;
-  }
+  _view.siriEnabled = self.colorMode == 1;
 
   if (self.colorMode == 2 && self.waveColor) {
     if (self.style == 4) {
@@ -271,17 +266,11 @@
   NSMutableDictionary *prefs = [@{} mutableCopy];
   [prefs setValue:name forKey:@"application"];
 
-  HBPreferences *file =
-      [[HBPreferences alloc] initWithIdentifier:MSHFPreferencesIdentifier];
+  NSDictionary *file =
+      [[NSDictionary alloc] initWithContentsOfFile:MSHFPrefsFile];
 
-  for (NSString *key in [file.dictionaryRepresentation allKeys]) {
+  for (NSString *key in [file allKeys]) {
     [prefs setValue:[file objectForKey:key] forKey:key];
-  }
-
-  NSMutableDictionary *colors =
-      [[NSMutableDictionary alloc] initWithContentsOfFile:MSHFColorsFile];
-  for (NSString *key in [colors allKeys]) {
-    [prefs setValue:[colors objectForKey:key] forKey:key];
   }
 
   for (NSString *key in [prefs allKeys]) {
