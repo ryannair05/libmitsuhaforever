@@ -1,5 +1,4 @@
 #import "public/MSHFView.h"
-#import "public/MSHFAudioSourceASS.h"
 #import "public/MSHFUtils.h"
 
 @implementation MSHFView
@@ -68,13 +67,15 @@ BOOL boost;
 }
 
 - (void)stop {
-  if (self.disableBatterySaver)
-    return;
-  [self.audioSource stop];
+  if (self.audioSource.isRunning && !self.disableBatterySaver)
+    [self.audioSource stop];
 }
 
 - (void)start {
-  [self.audioSource start];
+  NSString *identifier = [[NSProcessInfo processInfo] processName];
+  if ([identifier isEqualToString:@"Music"] || [identifier isEqualToString:@"Spotify"] || [[NSClassFromString(@"SBMediaController") sharedInstance] isPlaying]) {
+	  [self.audioSource start];
+  }
 }
 
 - (void)initializeWaveLayers {
@@ -154,26 +155,22 @@ BOOL boost;
         self.points[i].x = i * pixelFixer;
         double pureValue = data[i * compressionRate] * self.gain;
 
+        if (!pureValue) {
+          self.points[i].y = self.waveOffset;
+          continue;
+        }
+
         if (self.limiter != 0) {
           pureValue = (fabs(pureValue) < self.limiter
                           ? pureValue
                           : (pureValue < 0 ? -1 * self.limiter : self.limiter));
         }
 
-        self.points[i].y = (pureValue * self.sensitivity * 20);
-        
-        if (!self.points[i].y)
-          continue;
+        self.points[i].y = (pureValue * self.sensitivity);
 
-        if (fabs(self.points[i].y) < 1) {
-            self.points[i].y /= 100;
+        while (fabs(self.points[i].y) < 1.5) {
+            self.points[i].y *= 25;
         }
-
-        if (fabs(self.points[i].y) < 5) {
-            self.points[i].y *= 5;
-        }
-
-        
         self.points[i].y += self.waveOffset;
       }
   } else {
@@ -189,9 +186,9 @@ BOOL boost;
       }
 
       self.points[i].y = (pureValue * self.sensitivity) + self.waveOffset;
-      
+
       if (isnan(self.points[i].y))
-        self.points[i].y = 0;
+        self.points[i].y = self.waveOffset;
     }
   }
 }

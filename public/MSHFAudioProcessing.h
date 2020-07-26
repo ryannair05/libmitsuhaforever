@@ -8,8 +8,6 @@
   UInt32 numberOfFrames;
   float fftNormFactor;
   int numberOfFramesOver2;
-  float *outReal;
-  float *outImaginary;
   COMPLEX_SPLIT output;
   float *out;
 }

@@ -3,7 +3,6 @@
 #import "MSHFJelloView.h"
 #import "MSHFLineView.h"
 #import "MSHFSiriView.h"
-#import "MSHFView.h"
 
 @interface MSHFConfig : NSObject
 

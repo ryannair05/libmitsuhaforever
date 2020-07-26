@@ -9,11 +9,14 @@
   numberOfFramesOver2 = numberOfFrames / 2;
   fftNormFactor = -1.0 / 256.0;
 
-  outReal = (float *)malloc(sizeof(float) * numberOfFramesOver2);
-  outImaginary = (float *)malloc(sizeof(float) * numberOfFramesOver2);
+  float *outReal = (float *)malloc(sizeof(float) * numberOfFramesOver2);
+  float *outImaginary = (float *)malloc(sizeof(float) * numberOfFramesOver2);
   out = (float *)malloc(sizeof(float) * numberOfFramesOver2);
   output.realp = outReal;
   output.imagp = outImaginary;
+
+  free(outReal);
+  free(outImaginary);
 
   bufferLog2 = round(log2(numberOfFrames));
   fftSetup = vDSP_create_fftsetup(bufferLog2, kFFTRadix2);

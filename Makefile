@@ -13,6 +13,9 @@ $(LIBRARY_NAME)_LIBRARIES = colorpicker
 
 include $(THEOS_MAKE_PATH)/library.mk
 
+after-install::
+	install.exec "killall -9 SpringBoard"
+
 stage::
 	mkdir -p $(THEOS_STAGING_DIR)/usr/include/MitsuhaForever
 	$(ECHO_NOTHING)rsync -a ./public/* $(THEOS_STAGING_DIR)/usr/include/MitsuhaForever $(FW_RSYNC_EXCLUDES)$(ECHO_END)

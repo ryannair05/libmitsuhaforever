@@ -1,10 +1,6 @@
-#import "MSHFAudioDelegate.h"
 #import "MSHFAudioProcessing.h"
-#import "MSHFAudioProcessingDelegate.h"
-#import "MSHFAudioSource.h"
+#import "MSHFAudioSourceASS.h"
 #import <UIKit/UIKit.h>
-
-#define MSHFPreferencesIdentifier @"com.ryannair05.mitsuhaforever"
 
 @interface MSHFView : UIView <MSHFAudioDelegate, MSHFAudioProcessingDelegate> {
   NSUInteger cachedLength;
@@ -70,4 +66,9 @@
 @interface BluetoothManager
 + (id)sharedInstance;
 - (id)connectedDevices;
+@end
+
+@interface SBMediaController
++ (id)sharedInstance;
+- (BOOL)isPlaying; 
 @end

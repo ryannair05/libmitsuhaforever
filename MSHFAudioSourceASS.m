@@ -20,7 +20,7 @@ const int one = 1;
 }
 
 - (void)start {
-  NSLog(@"[libmitsuhaforeverforever] -(void)start called");
+  NSLog(@"[libmitsuhaforever] -(void)start called");
   forceDisconnect = false;
   if (self.isRunning)
     return;
@@ -34,7 +34,6 @@ const int one = 1;
         while (!forceDisconnect) {
           int r = -1;
           int rlen = 0;
-          float *data = NULL;
           UInt32 len = sizeof(float);
 
           NSLog(@"[libmitsuhaforever] Connecting to mediaserverd.");
@@ -57,12 +56,12 @@ const int one = 1;
           setsockopt(connfd, SOL_SOCKET, SO_NOSIGPIPE, &one, sizeof(one));
 
           struct sockaddr_in remote;
+          memset(&remote, 0, sizeof(struct sockaddr_in));
           remote.sin_family = PF_INET;
           remote.sin_port = htons(ASSPort);
           inet_aton("127.0.0.1", &remote.sin_addr);
           int cretries = 0;
-
-          while (r != 0 && cretries < 10) {
+          while (r != 0 && cretries < 5) {
             cretries++;
             r = connect(connfd, (struct sockaddr *)&remote, sizeof(remote));
             usleep(200 * 1000);
@@ -75,7 +74,7 @@ const int one = 1;
             continue;
           }
 
-          if (retries > 10) {
+          if (retries > 5) {
             forceDisconnect = true;
             NSLog(@"[libmitsuhaforever] Too many retries. Aborting.");
             break;
@@ -116,8 +115,7 @@ const int one = 1;
             }
 
             if (len > sizeof(float)) {
-              free(data);
-              data = (float *)malloc(len);
+              float *data = (float *)malloc(len);
               rlen = recv(connfd, data, len, 0);
 
               if (connfd < 0)
@@ -137,8 +135,8 @@ const int one = 1;
                   close(connfd);
                 connfd = -1;
                 len = sizeof(float);
-                data = empty;
               }
+              free(data);
             }
 
             usleep(16 * 1000);
