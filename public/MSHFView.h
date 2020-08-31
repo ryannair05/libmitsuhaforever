@@ -1,4 +1,5 @@
-#import "MSHFAudioProcessing.h"
+#import "../generated-headers/libmitsuhaforever-Swift.h"
+#import <Accelerate/Accelerate.h> 
 #import "MSHFAudioSourceASS.h"
 #import <UIKit/UIKit.h>
 

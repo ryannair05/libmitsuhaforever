@@ -34,6 +34,7 @@ const int one = 1;
         while (!forceDisconnect) {
           int r = -1;
           int rlen = 0;
+          float *data = NULL;
           UInt32 len = sizeof(float);
 
           NSLog(@"[libmitsuhaforever] Connecting to mediaserverd.");
@@ -60,6 +61,7 @@ const int one = 1;
           remote.sin_family = PF_INET;
           remote.sin_port = htons(ASSPort);
           inet_aton("127.0.0.1", &remote.sin_addr);
+
           int cretries = 0;
           while (r != 0 && cretries < 5) {
             cretries++;
@@ -115,7 +117,8 @@ const int one = 1;
             }
 
             if (len > sizeof(float)) {
-              float *data = (float *)malloc(len);
+              free(data);
+              data = (float *)malloc(len);
               rlen = recv(connfd, data, len, 0);
 
               if (connfd < 0)
@@ -135,8 +138,8 @@ const int one = 1;
                   close(connfd);
                 connfd = -1;
                 len = sizeof(float);
+                data = empty;
               }
-              free(data);
             }
 
             usleep(16 * 1000);

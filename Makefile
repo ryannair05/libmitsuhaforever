@@ -9,6 +9,7 @@ include $(THEOS)/makefiles/common.mk
 
 LIBRARY_NAME = libmitsuhaforever
 $(LIBRARY_NAME)_OBJC_FILES = $(wildcard *.m)
+$(LIBRARY_NAME)_FILES = $(wildcard *.swift)
 $(LIBRARY_NAME)_LIBRARIES = colorpicker
 
 include $(THEOS_MAKE_PATH)/library.mk
