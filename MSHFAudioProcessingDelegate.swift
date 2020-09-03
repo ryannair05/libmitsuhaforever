@@ -1,5 +1,5 @@
 import Foundation
 
-@objc (MSHFAudioProcessingDelegate) public protocol MSHFAudioProcessingDelegate: NSObjectProtocol {
+internal protocol MSHFAudioProcessingDelegate : class {
     func setSampleData(_ data: UnsafeMutablePointer<Float>?, length: Int32)
 }

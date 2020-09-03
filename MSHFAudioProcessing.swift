@@ -1,6 +1,6 @@
 import Accelerate
 
-@objc (MSHFAudioProcessing) public class MSHFAudioProcessing : NSObject {
+@objc final internal class MSHFAudioProcessing : NSObject {
 
     private var bufferLog2 : UInt = 0
     private var fftSetup: FFTSetup!
@@ -8,14 +8,12 @@ import Accelerate
     private var numberOfFrames: UInt = 0
     private var fftNormFactor: Float = 0.0
     private var numberOfFramesOver2 : UInt = 0
-    @objc public var fft : Bool = false
+    @objc internal var fft : Bool = false
     private var output: COMPLEX_SPLIT!
     private var out: UnsafeMutablePointer<Float>!
-    @objc public var delegate: MSHFAudioProcessingDelegate?
+    internal var delegate: MSHFAudioProcessingDelegate?
 
-    @objc public init(bufferSize: UInt) {
-        super.init()
-
+    internal init(bufferSize: UInt) {
         numberOfFrames = bufferSize
         numberOfFramesOver2 = numberOfFrames / 2
         fftNormFactor = -1.0 / 256.0
@@ -32,7 +30,7 @@ import Accelerate
         vDSP_hann_window(&window, numberOfFrames, Int32(vDSP_HANN_NORM))
     }
 
-    @objc public func process(_ data: UnsafeMutablePointer<Float>, withLength length: Int32) {
+    internal func process(_ data: UnsafeMutablePointer<Float>, withLength length: Int32) {
         if delegate == nil {
             return
         }
