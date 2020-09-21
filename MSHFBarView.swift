@@ -1,3 +1,5 @@
+import UIKit
+
 @objc (MSHFBarView) final public class MSHFBarView: MSHFView {
 
     @objc internal var barCornerRadius: CGFloat = 0
@@ -5,6 +7,7 @@
     private var redBars: CALayer?
     private var greenBars: CALayer?
     private var blueBars: CALayer?
+    private var cachedNumberOfPoints = 0
 
     override internal func initializeWaveLayers() {
         if siriEnabled {

@@ -1,3 +1,5 @@
+import QuartzCore
+
 final internal class MSHFJelloLayer: CAShapeLayer {
     internal var shouldAnimate = false
 

@@ -1,3 +1,5 @@
+import UIKit
+
 @objc (MSHFSiriView) final public class MSHFSiriView: MSHFView {
 
     private var waveLayer: MSHFJelloLayer?
@@ -6,6 +8,7 @@
     private var rSubwaveLayer: MSHFJelloLayer?
     private var subSubwaveLayer: MSHFJelloLayer?
     private var rSubSubwaveLayer: MSHFJelloLayer?
+    private var cachedNumberOfPoints = 0
 
     override internal func initializeWaveLayers() {
         waveLayer = MSHFJelloLayer()
@@ -84,16 +87,16 @@
     
     }
 
-    @objc override public func updateWave(_ waveColor: UIColor?, subwaveColor: UIColor?, subSubwaveColor: UIColor?) {
+    @objc override public func updateWave(_ waveColor: UIColor, subwaveColor: UIColor, subSubwaveColor: UIColor) {
         self.waveColor = waveColor
         self.subwaveColor = subwaveColor
         self.subSubwaveColor = subSubwaveColor
-        waveLayer?.fillColor = waveColor?.cgColor
-        rWaveLayer?.fillColor = waveColor?.cgColor
-        subwaveLayer?.fillColor = subwaveColor?.cgColor
-        rSubwaveLayer?.fillColor = subwaveColor?.cgColor
-        subSubwaveLayer?.fillColor = subSubwaveColor?.cgColor
-        rSubSubwaveLayer?.fillColor = subSubwaveColor?.cgColor
+        waveLayer?.fillColor = waveColor.cgColor
+        rWaveLayer?.fillColor = waveColor.cgColor
+        subwaveLayer?.fillColor = subwaveColor.cgColor
+        rSubwaveLayer?.fillColor = subwaveColor.cgColor
+        subSubwaveLayer?.fillColor = subSubwaveColor.cgColor
+        rSubSubwaveLayer?.fillColor = subSubwaveColor.cgColor
 
         waveLayer?.compositingFilter = "screenBlendMode"
         rWaveLayer?.compositingFilter = "screenBlendMode"
@@ -132,12 +135,12 @@
         })
     }
 
-    override internal func setSampleData(_ data: UnsafeMutablePointer<Float>?, length: Int32) {
+    override internal func setSampleData(_ data: UnsafeMutablePointer<Float>?, length: Int) {
         super.setSampleData(data, length: length)
 
-        points[Int(numberOfPoints) - 1].x = bounds.size.width
-        points[Int(numberOfPoints) - 1].y = waveOffset
-        points[0].y = points[Int(numberOfPoints) - 1].y
+        points[numberOfPoints - 1].x = bounds.size.width
+        points[numberOfPoints - 1].y = waveOffset
+        points[0].y = points[numberOfPoints - 1].y
     }
 
 
@@ -152,13 +155,13 @@
             path.addLine(to: p1)
 
             for i in 0..<numberOfPoints {
-                let p2 = self.points[Int(i)]
+                let p2 = self.points[i]
                 let midPoint = midPointForPoints(p1, p2)
 
                 path.addQuadCurve(to: midPoint, controlPoint: controlPointForPoints(midPoint, p1))
                 path.addQuadCurve(to: p2, controlPoint: controlPointForPoints(midPoint, p2))
 
-                p1 = self.points[Int(i)]
+                p1 = self.points[i]
             }
 
             // [path addLineToPoint:CGPointMake(self.frame.size.width, self.frame.size.height)];
@@ -173,14 +176,14 @@
             let pixelFixer: Float = (Float(bounds.size.width) / Float(numberOfPoints))
 
             if cachedNumberOfPoints != numberOfPoints {
-              self.points = unsafeBitCast(malloc(MemoryLayout<CGPoint>.size * Int(numberOfPoints)), to: UnsafeMutablePointer<CGPoint>.self)
+              self.points = unsafeBitCast(malloc(MemoryLayout<CGPoint>.size * numberOfPoints), to: UnsafeMutablePointer<CGPoint>.self)
               cachedNumberOfPoints = numberOfPoints
               for i in 0..<numberOfPoints {
-                self.points[Int(i)].x = CGFloat(i) * CGFloat(pixelFixer)
-                self.points[Int(i)].y = waveOffset //self.bounds.size.height/2;
+                self.points[i].x = CGFloat(i) * CGFloat(pixelFixer)
+                self.points[i].y = waveOffset //self.bounds.size.height/2;
               }
-              self.points[Int(numberOfPoints - 1)].x = bounds.size.width
-              self.points[Int(numberOfPoints - 1)].y = waveOffset
+              self.points[numberOfPoints - 1].x = bounds.size.width
+              self.points[numberOfPoints - 1].y = waveOffset
             }
 
             return createPath(withPoints: self.points,

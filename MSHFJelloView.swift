@@ -1,18 +1,19 @@
+import UIKit
+
 @objc (MSHFJelloView) final public class MSHFJelloView: MSHFView {
 
   private var waveLayer: MSHFJelloLayer?
   private var subwaveLayer: MSHFJelloLayer?
   private var subSubwaveLayer: MSHFJelloLayer?
+  private var cachedNumberOfPoints = 0
 
   override internal func initializeWaveLayers() {
     layer.sublayers = nil
     waveLayer = MSHFJelloLayer()
     subwaveLayer = MSHFJelloLayer()
 
-    if !siriEnabled {
-        subwaveLayer!.frame = bounds
-        waveLayer!.frame = subwaveLayer!.frame
-    }
+    subwaveLayer!.frame = bounds
+    waveLayer!.frame = subwaveLayer!.frame
 
     layer.addSublayer(waveLayer!)
     layer.addSublayer(subwaveLayer!)
@@ -24,8 +25,6 @@
       subSubwaveLayer = MSHFJelloLayer()
 
       subSubwaveLayer!.frame = bounds
-      subwaveLayer!.frame = subSubwaveLayer!.frame
-      waveLayer!.frame = subwaveLayer!.frame
 
       layer.addSublayer(subSubwaveLayer!)
 
@@ -60,14 +59,13 @@
   }
 
   override internal func resetWaveLayers() {
-    if !siriEnabled {
-        if waveLayer == nil || subwaveLayer == nil {
-            initializeWaveLayers()
-        }
-    } else {
-        if waveLayer == nil || subwaveLayer == nil || subSubwaveLayer == nil {
-            initializeWaveLayers()
-        }
+    
+    if waveLayer == nil || subwaveLayer == nil {
+        initializeWaveLayers()
+    }
+    
+    else if siriEnabled && subSubwaveLayer == nil {
+        initializeWaveLayers()
     }
 
     let path = createPath(withPoints: points, pointCount: 0, in: bounds)
@@ -81,14 +79,14 @@
     }
   }
 
-  @objc override public func updateWave(_ waveColor: UIColor?, subwaveColor: UIColor?) {
+  @objc override public func updateWave(_ waveColor: UIColor, subwaveColor: UIColor) {
         self.waveColor = waveColor
         self.subwaveColor = subwaveColor
-        waveLayer?.fillColor = waveColor?.cgColor
-        subwaveLayer?.fillColor = subwaveColor?.cgColor
+        waveLayer?.fillColor = waveColor.cgColor
+        subwaveLayer?.fillColor = subwaveColor.cgColor
     }
   
-  @objc override public func updateWave(_ waveColor: UIColor?, subwaveColor: UIColor?, subSubwaveColor: UIColor?)  {
+  @objc override public func updateWave(_ waveColor: UIColor, subwaveColor: UIColor, subSubwaveColor: UIColor)  {
         if waveLayer == nil || subwaveLayer == nil || subSubwaveLayer == nil {
             initializeWaveLayers()
         }
@@ -96,12 +94,12 @@
         self.waveColor = waveColor
         self.subwaveColor = subwaveColor
         self.subSubwaveColor = subSubwaveColor
-        waveLayer?.fillColor = waveColor?.cgColor
-        subwaveLayer?.fillColor = subwaveColor?.cgColor
-        subSubwaveLayer?.fillColor = subSubwaveColor?.cgColor
-        waveLayer?.compositingFilter = "screenBlendMode"
-        subwaveLayer?.compositingFilter = "screenBlendMode"
-        subSubwaveLayer?.compositingFilter = "screenBlendMode"
+        waveLayer!.fillColor = waveColor.cgColor
+        subwaveLayer!.fillColor = subwaveColor.cgColor
+        subSubwaveLayer!.fillColor = subSubwaveColor.cgColor
+        waveLayer!.compositingFilter = "screenBlendMode"
+        subwaveLayer!.compositingFilter = "screenBlendMode"
+        subSubwaveLayer!.compositingFilter = "screenBlendMode"
     }
 
   override internal func redraw() {
@@ -124,12 +122,12 @@
     }
   }
 
-  override internal func setSampleData(_ data: UnsafeMutablePointer<Float>?, length: Int32) {
+  override internal func setSampleData(_ data: UnsafeMutablePointer<Float>?, length: Int) {
         super.setSampleData(data, length: length)
 
-        points[Int(numberOfPoints) - 1].x = bounds.size.width
-        points[Int(numberOfPoints) - 1].y = waveOffset
-        points[0].y = points[Int(numberOfPoints) - 1].y
+        points[numberOfPoints - 1].x = bounds.size.width
+        points[numberOfPoints - 1].y = waveOffset
+        points[0].y = points[numberOfPoints - 1].y
   }
 
   private func createPath(withPoints points: UnsafeMutablePointer<CGPoint>?, pointCount: Int, in rect: CGRect) -> CGPath {
@@ -143,13 +141,13 @@
             path.addLine(to: p1)
 
             for i in 0..<numberOfPoints {
-                let p2 = self.points[Int(i)]
+                let p2 = self.points[i]
                 let midPoint = midPointForPoints(p1, p2)
 
                 path.addQuadCurve(to: midPoint, controlPoint: controlPointForPoints(midPoint, p1))
                 path.addQuadCurve(to: p2, controlPoint: controlPointForPoints(midPoint, p2))
 
-                p1 = self.points[Int(i)]
+                p1 = self.points[i]
             }
 
             // [path addLineToPoint:CGPointMake(self.frame.size.width, self.frame.size.height)];
@@ -164,14 +162,14 @@
             let pixelFixer: Float = (Float(bounds.size.width) / Float(numberOfPoints))
 
             if cachedNumberOfPoints != numberOfPoints {
-              self.points = unsafeBitCast(malloc(MemoryLayout<CGPoint>.size * Int(numberOfPoints)), to: UnsafeMutablePointer<CGPoint>.self)
+              self.points = unsafeBitCast(malloc(MemoryLayout<CGPoint>.size * numberOfPoints), to: UnsafeMutablePointer<CGPoint>.self)
               cachedNumberOfPoints = numberOfPoints
               for i in 0..<numberOfPoints {
-                self.points[Int(i)].x = CGFloat(i) * CGFloat(pixelFixer)
-                self.points[Int(i)].y = waveOffset //self.bounds.size.height/2;
+                self.points[i].x = CGFloat(i) * CGFloat(pixelFixer)
+                self.points[i].y = waveOffset //self.bounds.size.height/2;
               }
-              self.points[Int(numberOfPoints - 1)].x = bounds.size.width
-              self.points[Int(numberOfPoints - 1)].y = waveOffset
+              self.points[numberOfPoints - 1].x = bounds.size.width
+              self.points[numberOfPoints - 1].y = waveOffset
             }
 
             return createPath(withPoints: self.points,

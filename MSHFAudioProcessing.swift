@@ -30,7 +30,7 @@ import Accelerate
         vDSP_hann_window(&window, numberOfFrames, Int32(vDSP_HANN_NORM))
     }
 
-    internal func process(_ data: UnsafeMutablePointer<Float>, withLength length: Int32) {
+    internal func process(_ data: UnsafeMutablePointer<Float>, withLength length: Int) {
         if delegate == nil {
             return
         }
@@ -42,7 +42,7 @@ import Accelerate
             vDSP_fft_zrip(fftSetup, &output, 1, bufferLog2, FFTDirection(FFT_FORWARD))
             vDSP_zvabs(&output, 1, out, 1, numberOfFramesOver2)
             vDSP_vsmul(out, 1, &fftNormFactor, out, 1, numberOfFramesOver2)
-            delegate!.setSampleData(out, length: Int32(numberOfFramesOver2 / 8))
+            delegate!.setSampleData(out, length: Int(numberOfFramesOver2) / 8)
         } else {
             delegate!.setSampleData(data, length: length)
         }

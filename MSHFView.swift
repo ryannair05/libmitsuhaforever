@@ -1,8 +1,9 @@
+import UIKit
+
 private var boost:Bool = false
 
 @objc (MSHFView) public class MSHFView: UIView, MSHFAudioDelegate, MSHFAudioProcessingDelegate {
     private var cachedLength = 0
-    internal var cachedNumberOfPoints = 0
     private var silentSince: Int64 = 0
     private var MSHFHidden = false
 
@@ -79,7 +80,7 @@ private var boost:Bool = false
       shouldUpdate = true
 
       cachedLength = numberOfPoints
-      points = unsafeBitCast(malloc(MemoryLayout<CGPoint>.size * Int(numberOfPoints)), to: UnsafeMutablePointer<CGPoint>.self)
+      points = unsafeBitCast(malloc(MemoryLayout<CGPoint>.size * numberOfPoints), to: UnsafeMutablePointer<CGPoint>.self)
 
       let MSHFPrefsFile = "/var/mobile/Library/Preferences/com.ryannair05.mitsuhaforever.plist"
       if let prefs = NSDictionary(contentsOfFile:MSHFPrefsFile) {
@@ -87,17 +88,17 @@ private var boost:Bool = false
       }
     }
 
-  @objc internal func stop() {
+  @objc public func stop() {
     if audioSource?.isRunning ?? true && !disableBatterySaver {
         audioSource?.stop()
     }
   }
 
-  @objc internal func start() {
-    // let identifier = ProcessInfo.processInfo.processName
-    // if (identifier == "Music") || (identifier == "Spotify") || NSClassFromString("SBMediaController")?.sharedInstance().isPlaying ?? false || FileManager.default.fileExists(atPath: "/Library/MobileSubstrate/DynamicLibraries/RoadRunner.dylib") {
+  @objc public func start() {
+    let identifier = ProcessInfo.processInfo.processName
+    if (identifier == "Music") || (identifier == "Spotify") || ((NSClassFromString("SBMediaController")?.sharedInstance().isPlaying()) == true) || FileManager.default.fileExists(atPath: "/Library/MobileSubstrate/DynamicLibraries/RoadRunner.dylib") {
         audioSource?.start()
-    // }
+     }
   }
 
   internal func initializeWaveLayers() {
@@ -147,10 +148,10 @@ private var boost:Bool = false
       } 
     }
 
-  public func updateBuffer(_ bufferData: UnsafeMutablePointer<Float>, withLength length: Int32) {
+   public func updateBuffer(_ bufferData: UnsafeMutablePointer<Float>, withLength length: Int) {
       if autoHide {
           for i in 0..<(length / 4) {
-              if Double(bufferData[Int(i)]) > 0.000005 || Double(bufferData[Int(i)]) < -0.000005 {
+              if Double(bufferData[i]) > 0.000005 || Double(bufferData[i]) < -0.000005 {
                   silentSince = Int64(Date().timeIntervalSince1970)
                   break
               }
@@ -160,13 +161,13 @@ private var boost:Bool = false
       audioProcessing?.process(bufferData, withLength: length)
   }
 
-  internal func setSampleData(_ data: UnsafeMutablePointer<Float>?, length: Int32) {
-      let compressionRate = Int(length) / Int(numberOfPoints)
+  internal func setSampleData(_ data: UnsafeMutablePointer<Float>?, length: Int) {
+      let compressionRate = length / numberOfPoints
       let pixelFixer: Float = (Float(bounds.size.width) / Float(numberOfPoints))
 
       if cachedLength != numberOfPoints {
           free(points)
-          points =  unsafeBitCast(malloc(MemoryLayout<CGPoint>.size * Int(numberOfPoints)), to: UnsafeMutablePointer<CGPoint>.self)
+          points =  unsafeBitCast(malloc(MemoryLayout<CGPoint>.size * numberOfPoints), to: UnsafeMutablePointer<CGPoint>.self)
           cachedLength = numberOfPoints
       }
 

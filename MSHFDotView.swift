@@ -1,9 +1,12 @@
+import UIKit
+
 @objc (MSHFDotView) final public class MSHFDotView: MSHFView {
 
   internal var barSpacing: CGFloat = 5
   private var redDots: CALayer?
   private var greenDots: CALayer?
   private var blueDots: CALayer?
+  private var cachedNumberOfPoints = 0
 
   override internal func initializeWaveLayers() {
     if siriEnabled {
