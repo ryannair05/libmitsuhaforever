@@ -1,3 +1,6 @@
-#import "public/MSHFAudioSourceASS.h"
 #import "public/DarwinNotificationsManager.h"
-#import <libcolorpicker.h>
+
+@interface SBMediaController
++ (id)sharedInstance;
+- (BOOL)isPlaying;
+@end
