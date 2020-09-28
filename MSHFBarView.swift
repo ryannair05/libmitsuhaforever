@@ -96,7 +96,7 @@ import UIKit
       cachedNumberOfPoints = numberOfPoints
     }
 
-   @objc override public func updateWave(_ waveColor: UIColor,
+   @objc override public func updateWaveColor(_ waveColor: UIColor,
         subwaveColor: UIColor) {
         self.waveColor = waveColor
         layer.sublayers?.forEach { layer in
@@ -104,7 +104,7 @@ import UIKit
         }
     }
 
-    @objc override public func updateWave(_ waveColor: UIColor, subwaveColor: UIColor, subSubwaveColor: UIColor) {
+    @objc override public func updateWaveColor(_ waveColor: UIColor, subwaveColor: UIColor, subSubwaveColor: UIColor) {
         if redBars == nil || greenBars == nil || blueBars == nil {
             initializeWaveLayers()
         }

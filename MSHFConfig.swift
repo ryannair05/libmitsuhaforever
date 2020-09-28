@@ -71,7 +71,7 @@ private func LCPParseColorString(_ hexString: String?, _ fallback: String?) -> U
     private var disableBatterySaver = false
     private var enableFFT = false
     private var enableAutoHide = false
-    private var gain = 0.0
+    private var gain: Float = 0.0
     private var limiter = 0.0
     private var waveColor: UIColor?
     private var subwaveColor: UIColor?
@@ -146,7 +146,7 @@ private func LCPParseColorString(_ hexString: String?, _ fallback: String?) -> U
         view!.displayLink?.preferredFramesPerSecond = Int(fps)
         view!.numberOfPoints = Int(numberOfPoints)
         view!.waveOffset = waveOffset + waveOffsetOffset
-        view!.gain = Float(gain)
+        view!.gain = gain
         view!.limiter = limiter
         view!.sensitivity = sensitivity
         view!.audioProcessing?.fft = enableFFT
@@ -155,22 +155,22 @@ private func LCPParseColorString(_ hexString: String?, _ fallback: String?) -> U
 
         if colorMode == 2 && waveColor != nil {
             if style == 4 {
-                view!.updateWave(
+                view!.updateWaveColor(
                     waveColor!.copy() as! UIColor,
                     subwaveColor: waveColor!.copy() as! UIColor,
                     subSubwaveColor: waveColor!.copy() as! UIColor)
             } else {
-                view!.updateWave(
+                view!.updateWaveColor(
                     waveColor!.copy() as! UIColor,
                     subwaveColor: waveColor!.copy() as! UIColor)
             }
         } else if colorMode == 1 && waveColor != nil && subwaveColor != nil && subSubwaveColor != nil {
-            view!.updateWave(
+            view!.updateWaveColor(
                 waveColor!.copy() as! UIColor,
                 subwaveColor: subwaveColor!.copy() as! UIColor,
                 subSubwaveColor: subSubwaveColor!.copy() as! UIColor)
         } else if calculatedColor != nil {
-            view!.updateWave(
+            view!.updateWaveColor(
                 calculatedColor!.copy() as! UIColor,
                 subwaveColor: calculatedColor!.copy() as! UIColor)
         }
@@ -225,26 +225,26 @@ private func LCPParseColorString(_ hexString: String?, _ fallback: String?) -> U
             }
 
             if colorMode == 1 {
-                view!.updateWave(color,
+                view!.updateWaveColor(color,
                     subwaveColor: scolor,
                     subSubwaveColor: sscolor)
             } else if style == 4 {
-                view!.updateWave(color,
+                view!.updateWaveColor(color,
                     subwaveColor: color,
                     subSubwaveColor: color)
             }
             else {
-                view!.updateWave(color,
+                view!.updateWaveColor(color,
                     subwaveColor: color)
             }
         } else {
             let color = waveColor!
             if style == 4 {
-                view!.updateWave(color,
+                view!.updateWaveColor(color,
                     subwaveColor: color,
                     subSubwaveColor: color)
             } else {
-                view!.updateWave(color,
+                view!.updateWaveColor(color,
                     subwaveColor: color)
             }
         }
@@ -305,7 +305,7 @@ private func LCPParseColorString(_ hexString: String?, _ fallback: String?) -> U
         } else {
             subwaveColor = UIColor.black.withAlphaComponent(0.5)
         }
-      gain = dict?["gain"] as? Double ?? 50
+      gain = dict?["gain"] as? Float ?? 50
       limiter = dict?["limiter"] as? Double ?? 0
       numberOfPoints = dict?["numberOfPoints"] as? UInt ?? 8
       sensitivity = dict?["sensitivity"] as? CGFloat ?? 1

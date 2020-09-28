@@ -61,6 +61,10 @@ class MSHFAudioSourceASS: MSHFAudioSource {
       isRunning = false
   }
 
+  deinit {
+      free(empty)
+  }
+
   override func start() {
 
       NSLog("[libmitsuhaforever] -(void)start called")
@@ -71,11 +75,11 @@ class MSHFAudioSourceASS: MSHFAudioSource {
       isRunning = true
       delegate?.updateBuffer(empty, withLength: 1024)
       DispatchQueue.global(qos: .default).async(
-          execute: {
+          execute: { [self] in
 
         var retries = 0
 
-        while !self.forceDisconnect {
+        while !forceDisconnect {
             var r = -1
             var rlen = 0
             var data: UnsafeMutablePointer<Float>? = nil
@@ -83,9 +87,9 @@ class MSHFAudioSourceASS: MSHFAudioSource {
 
             NSLog("[libmitsuhaforever] Connecting to mediaserverd.")
             retries += 1
-            self.connfd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)
+            connfd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)
 
-            if self.connfd == -1 {
+            if connfd == -1 {
                 usleep(1000 * 1000)
                 NSLog("[libmitsuhaforever] Connection failed.")
                 continue
@@ -94,9 +98,9 @@ class MSHFAudioSourceASS: MSHFAudioSource {
             var tv: timeval = timeval()
             tv.tv_sec = 0
             tv.tv_usec = 50000
-            setsockopt(self.connfd, SOL_SOCKET, SO_RCVTIMEO, &tv, socklen_t(MemoryLayout.size(ofValue: tv)))
-            setsockopt(self.connfd, SOL_SOCKET, SO_SNDTIMEO, &tv, socklen_t(MemoryLayout.size(ofValue: tv)))
-            setsockopt(self.connfd, SOL_SOCKET, SO_NOSIGPIPE, &one, socklen_t(MemoryLayout.size(ofValue: one)))
+            setsockopt(connfd, SOL_SOCKET, SO_RCVTIMEO, &tv, socklen_t(MemoryLayout.size(ofValue: tv)))
+            setsockopt(connfd, SOL_SOCKET, SO_SNDTIMEO, &tv, socklen_t(MemoryLayout.size(ofValue: tv)))
+            setsockopt(connfd, SOL_SOCKET, SO_NOSIGPIPE, &one, socklen_t(MemoryLayout.size(ofValue: one)))
 
             var remote: sockaddr_in = sockaddr_in()
             // memset(&remote, 0,  MemoryLayout<sockaddr_in>.size)
@@ -110,7 +114,7 @@ class MSHFAudioSourceASS: MSHFAudioSource {
                 let remote2 = remote
                 withUnsafePointer(to: &remote) {sockaddrInPtr in
                     let sockaddrPtr = UnsafeRawPointer(sockaddrInPtr).assumingMemoryBound(to: sockaddr.self)
-                    r = Int(connect(self.connfd, sockaddrPtr, socklen_t(MemoryLayout.size(ofValue: remote2))))
+                    r = Int(connect(connfd, sockaddrPtr, socklen_t(MemoryLayout.size(ofValue: remote2))))
                 }
                 usleep(200 * 1000)
             }
@@ -123,7 +127,7 @@ class MSHFAudioSourceASS: MSHFAudioSource {
             }
             
             if retries > 5 {
-                self.forceDisconnect = true
+                forceDisconnect = true
                 NSLog("[libmitsuhaforever] Too many retries. Aborting.")
                 break
             }
@@ -133,19 +137,19 @@ class MSHFAudioSourceASS: MSHFAudioSource {
             var readset: fd_set = fd_set()
             var result: Int32 = -1
             readset.fds_bits = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-            FD_SET(fd: self.connfd, set: &readset)
-            
+            FD_SET(fd: connfd, set: &readset)
+          
 
-            while !self.forceDisconnect {
+            while !forceDisconnect {
 
-                if self.connfd < 0 {
+                if connfd < 0 {
                     break
                 }
 
-                result = select(self.connfd + 1, &readset, nil, nil, &tv)
+                result = select(connfd + 1, &readset, nil, nil, &tv)
 
                 if result < 0 {
-                    close(self.connfd)
+                    close(connfd)
                     break
                 }
 
@@ -160,54 +164,54 @@ class MSHFAudioSourceASS: MSHFAudioSource {
 
 
                 if len > 8192 || len < 0 {
-                    close(self.connfd)
+                    close(connfd)
                     break
                 }
 
                 if len > MemoryLayout<Float>.size {
                     free(data)
                     data = unsafeBitCast(malloc(Int(len)), to: UnsafeMutablePointer<Float>.self)
-                    rlen = recv(self.connfd, data, Int(len), 0)
+                    rlen = recv(connfd, data, Int(len), 0)
 
                     if rlen > 0 {
-                        if self.delegate != nil {
-                            self.delegate!.updateBuffer(
+                        if delegate != nil {
+                            delegate!.updateBuffer(
                                 data!,
                                 withLength: rlen / MemoryLayout<Float>.size)
                         } else {
-                            close(self.connfd)
-                            self.connfd = -1
+                            close(connfd)
+                            connfd = -1
                         }
                     } else {
                         if rlen == 0 {
-                            close(self.connfd)
+                            close(connfd)
                         }
-                        self.connfd = -1
+                        connfd = -1
                         len = UInt32(MemoryLayout<Float>.size)
-                        data = self.empty
+                        data = empty
                     }
                 }
 
                 usleep(16 * 1000)
-                rlen = send(self.connfd, &one, MemoryLayout<Int>.size, 0)
+                rlen = send(connfd, &one, MemoryLayout<Int>.size, 0)
                 if rlen <= 0 {
-                    close(self.connfd)
-                    self.connfd = -1
+                    close(connfd)
+                    connfd = -1
                     break
                 }
             }
 
-            if self.forceDisconnect {
+            if forceDisconnect {
                 NSLog("[libmitsuhaforever] Forcefully disconnected.")
-                close(self.connfd)
-                self.connfd = -1
+                close(connfd)
+                connfd = -1
                 break
             }
 
             NSLog("[libmitsuhaforever] Lost connection.")
             usleep(1000 * 1000)
         }
-        self.isRunning = false
+        isRunning = false
 
         NSLog("[libmitsuhaforever] Finally disconnected.")
     })

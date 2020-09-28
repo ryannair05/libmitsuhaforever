@@ -79,14 +79,14 @@ import UIKit
     }
   }
 
-  @objc override public func updateWave(_ waveColor: UIColor, subwaveColor: UIColor) {
+  @objc override public func updateWaveColor(_ waveColor: UIColor, subwaveColor: UIColor) {
         self.waveColor = waveColor
         self.subwaveColor = subwaveColor
         waveLayer?.fillColor = waveColor.cgColor
         subwaveLayer?.fillColor = subwaveColor.cgColor
     }
   
-  @objc override public func updateWave(_ waveColor: UIColor, subwaveColor: UIColor, subSubwaveColor: UIColor)  {
+  @objc override public func updateWaveColor(_ waveColor: UIColor, subwaveColor: UIColor, subSubwaveColor: UIColor)  {
         if waveLayer == nil || subwaveLayer == nil || subSubwaveLayer == nil {
             initializeWaveLayers()
         }
@@ -159,13 +159,13 @@ import UIKit
             return convertedPath.copy()!
         }
          else {
-            let pixelFixer: Float = (Float(bounds.size.width) / Float(numberOfPoints))
+            let pixelFixer: CGFloat = bounds.size.width / CGFloat(numberOfPoints)
 
             if cachedNumberOfPoints != numberOfPoints {
               self.points = unsafeBitCast(malloc(MemoryLayout<CGPoint>.size * numberOfPoints), to: UnsafeMutablePointer<CGPoint>.self)
               cachedNumberOfPoints = numberOfPoints
               for i in 0..<numberOfPoints {
-                self.points[i].x = CGFloat(i) * CGFloat(pixelFixer)
+                self.points[i].x = CGFloat(i) * pixelFixer
                 self.points[i].y = waveOffset //self.bounds.size.height/2;
               }
               self.points[numberOfPoints - 1].x = bounds.size.width

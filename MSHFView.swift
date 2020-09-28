@@ -31,7 +31,7 @@ private var boost:Bool = false
     @objc internal var waveOffset: CGFloat = 0.0
     @objc internal var sensitivity: CGFloat = 0.0
     @objc internal var displayLink: CADisplayLink?
-    internal var points: UnsafeMutablePointer<CGPoint> = UnsafeMutablePointer<CGPoint>.allocate(capacity: 0)
+    internal var points: UnsafeMutablePointer<CGPoint>!
     internal var siriEnabled = false
     internal var waveColor: UIColor?
     internal var subwaveColor: UIColor?
@@ -47,7 +47,7 @@ private var boost:Bool = false
       self.init(frame: frame, audioSource: MSHFAudioSourceASS())
     }
 
-    @objc public init(frame: CGRect, audioSource: MSHFAudioSource?) {
+    public init(frame: CGRect, audioSource: MSHFAudioSource?) {
 
       super.init(frame: frame)
 
@@ -118,11 +118,11 @@ private var boost:Bool = false
     displayLink!.preferredFramesPerSecond = 60
   }
 
-  @objc public func updateWave(_ waveColor: UIColor,subwaveColor: UIColor) {
+  @objc public func updateWaveColor(_ waveColor: UIColor,subwaveColor: UIColor) {
 
   }
 
-  @objc public func updateWave(_ waveColor: UIColor,subwaveColor: UIColor,subSubwaveColor: UIColor) {
+  @objc public func updateWaveColor(_ waveColor: UIColor,subwaveColor: UIColor,subSubwaveColor: UIColor) {
 
   }
 
@@ -163,7 +163,7 @@ private var boost:Bool = false
 
   internal func setSampleData(_ data: UnsafeMutablePointer<Float>?, length: Int) {
       let compressionRate = length / numberOfPoints
-      let pixelFixer: Float = (Float(bounds.size.width) / Float(numberOfPoints))
+      let pixelFixer: CGFloat = bounds.size.width / CGFloat(numberOfPoints)
 
       if cachedLength != numberOfPoints {
           free(points)
@@ -174,7 +174,7 @@ private var boost:Bool = false
       if boost {
 
           for i in 0..<numberOfPoints {
-              points[i].x = CGFloat(i) * CGFloat(pixelFixer)
+              points[i].x = CGFloat(i) * pixelFixer
               var pureValue: CGFloat = CGFloat(data![i * compressionRate] * gain)
 
               if pureValue == 0.0 {
@@ -183,7 +183,7 @@ private var boost:Bool = false
               }
 
               if limiter != 0 {
-                  pureValue = abs(Float(pureValue)) < Float(limiter)
+                  pureValue = abs(Float(pureValue)) < limiter
                       ? pureValue
                       : (pureValue < 0 ? -1 * CGFloat(limiter) : CGFloat(limiter))
               }
@@ -198,11 +198,11 @@ private var boost:Bool = false
       }
       else {
         for i in 0..<numberOfPoints {
-          points[i].x = CGFloat(i) * CGFloat(pixelFixer)
+          points[i].x = CGFloat(i) * pixelFixer
           var pureValue: CGFloat = CGFloat(data![i * compressionRate] * gain)
 
           if limiter != 0 {
-              pureValue = abs(Float(pureValue)) < Float(limiter)
+              pureValue = abs(Float(pureValue)) < limiter
                   ? pureValue
                   : (pureValue < 0 ? -1 * CGFloat(limiter) : CGFloat(limiter))
           }
