@@ -47,7 +47,7 @@ import UIKit
 
   private func controlPointForPoints(_ p1: CGPoint, _ p2: CGPoint) -> CGPoint {
     var controlPoint = midPointForPoints(p1, p2)
-    let diffY = CGFloat(abs(Float(p2.y - controlPoint.y)))
+    let diffY = abs(p2.y - controlPoint.y)
 
     if p1.y < p2.y {
         controlPoint.y += diffY
@@ -59,15 +59,6 @@ import UIKit
   }
 
   override internal func resetWaveLayers() {
-    
-    if waveLayer == nil || subwaveLayer == nil {
-        initializeWaveLayers()
-    }
-    
-    else if siriEnabled && subSubwaveLayer == nil {
-        initializeWaveLayers()
-    }
-
     let path = createPath(withPoints: points, pointCount: 0, in: bounds)
 
     NSLog("[libmitsuha]: Resetting Wave Layers...")

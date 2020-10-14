@@ -42,7 +42,7 @@ import UIKit
         for i in 0..<numberOfPoints {
             let layer = CALayer()
             layer.cornerRadius = barWidth / 2.0
-            layer.frame = CGRect(x: CGFloat(CGFloat(i) * width) + barSpacing, y: 0, width: barWidth, height: barWidth)
+            layer.frame = CGRect(x: CGFloat(i) * width + barSpacing, y: 0, width: barWidth, height: barWidth)
             layer.backgroundColor = waveColor?.cgColor
             self.layer.addSublayer(layer)
         }
@@ -54,7 +54,7 @@ import UIKit
         for r in 0..<numberOfPoints {
           let layer = CALayer()
           layer.cornerRadius = barWidth / 2.0
-          layer.frame = CGRect(x: CGFloat(CGFloat(r) * width) + barSpacing, y: 0, width: barWidth, height: barWidth)
+          layer.frame = CGRect(x: CGFloat(r) * width + barSpacing, y: 0, width: barWidth, height: barWidth)
           layer.backgroundColor = waveColor?.cgColor
           redDots?.addSublayer(layer)
         }
@@ -62,7 +62,7 @@ import UIKit
          for g in 0..<numberOfPoints {
           let layer = CALayer()
           layer.cornerRadius = barWidth / 2.0
-          layer.frame = CGRect(x: CGFloat(CGFloat(g) * width) + barSpacing, y: 0, width: barWidth, height: barWidth)
+          layer.frame = CGRect(x: CGFloat(g) * width + barSpacing, y: 0, width: barWidth, height: barWidth)
           layer.backgroundColor = waveColor?.cgColor
           greenDots?.addSublayer(layer)
         }
@@ -70,7 +70,7 @@ import UIKit
         for b in 0..<numberOfPoints {
           let layer = CALayer()
           layer.cornerRadius = barWidth / 2.0
-          layer.frame = CGRect(x: CGFloat(CGFloat(b) * width) + barSpacing, y: 0, width: barWidth, height: barWidth)
+          layer.frame = CGRect(x: CGFloat(b) * width + barSpacing, y: 0, width: barWidth, height: barWidth)
           layer.backgroundColor = waveColor?.cgColor
           blueDots?.addSublayer(layer) 
         }
@@ -87,7 +87,7 @@ import UIKit
   }
 
   @objc override public func updateWaveColor(_ waveColor: UIColor, subwaveColor: UIColor, subSubwaveColor: UIColor) {
-    if redDots == nil || greenDots == nil || blueDots == nil {
+    if redDots == nil {
         initializeWaveLayers()
     }
     self.waveColor = waveColor

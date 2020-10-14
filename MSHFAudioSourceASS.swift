@@ -3,7 +3,7 @@ import Foundation
 let ASSPort:UInt16 = 44333
 var one = 1
 
-func FD_SET(fd: Int32, set: inout fd_set) {
+private func FD_SET(fd: Int32, set: inout fd_set) {
     let intOffset = Int(fd / 32)
     let bitOffset = fd % 32
     let mask: Int32 = 1 << bitOffset
@@ -80,7 +80,7 @@ class MSHFAudioSourceASS: MSHFAudioSource {
         var retries = 0
 
         while !forceDisconnect {
-            var r = -1
+            var r : Int32 = -1
             var rlen = 0
             var data: UnsafeMutablePointer<Float>? = nil
             var len = UInt32(MemoryLayout<Float>.size)
@@ -114,7 +114,7 @@ class MSHFAudioSourceASS: MSHFAudioSource {
                 let remote2 = remote
                 withUnsafePointer(to: &remote) {sockaddrInPtr in
                     let sockaddrPtr = UnsafeRawPointer(sockaddrInPtr).assumingMemoryBound(to: sockaddr.self)
-                    r = Int(connect(connfd, sockaddrPtr, socklen_t(MemoryLayout.size(ofValue: remote2))))
+                    r = connect(connfd, sockaddrPtr, socklen_t(MemoryLayout.size(ofValue: remote2)))
                 }
                 usleep(200 * 1000)
             }

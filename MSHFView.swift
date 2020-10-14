@@ -4,7 +4,7 @@ private var boost:Bool = false
 
 @objc (MSHFView) public class MSHFView: UIView, MSHFAudioDelegate, MSHFAudioProcessingDelegate {
     private var cachedLength = 0
-    private var silentSince: Int64 = 0
+    private var silentSince: TimeInterval = 0
     private var MSHFHidden = false
 
     @objc private var shouldUpdate = false
@@ -15,7 +15,7 @@ private var boost:Bool = false
             _autoHide
         }
         set(value) {
-            if value && (silentSince < (Int64(Date().timeIntervalSince1970) - 1)) {
+            if value && (silentSince < (Date().timeIntervalSince1970 - 1)) {
                 MSHFHidden = true
                 alpha = 0.0
             } else {
@@ -26,8 +26,8 @@ private var boost:Bool = false
     }
     
     @objc internal var numberOfPoints = 0
-    @objc internal var gain: Float = 0.0
-    @objc internal var limiter = 0.0
+    @objc internal var gain: CGFloat = 0.0
+    @objc internal var limiter: CGFloat = 0.0
     @objc internal var waveOffset: CGFloat = 0.0
     @objc internal var sensitivity: CGFloat = 0.0
     @objc internal var displayLink: CADisplayLink?
@@ -128,7 +128,7 @@ private var boost:Bool = false
 
   @objc internal func redraw() {
        if autoHide {
-          if silentSince < (Int64(Date().timeIntervalSince1970) - 1) {
+          if silentSince < (Date().timeIntervalSince1970 - 1) {
               if MSHFHidden {
                   MSHFHidden = false
                   UIView.animate(
@@ -151,8 +151,8 @@ private var boost:Bool = false
    public func updateBuffer(_ bufferData: UnsafeMutablePointer<Float>, withLength length: Int) {
       if autoHide {
           for i in 0..<(length / 4) {
-              if Double(bufferData[i]) > 0.000005 || Double(bufferData[i]) < -0.000005 {
-                  silentSince = Int64(Date().timeIntervalSince1970)
+              if bufferData[i] > 0.000005 || bufferData[i] < -0.000005 {
+                  silentSince = Date().timeIntervalSince1970
                   break
               }
           }
@@ -175,7 +175,7 @@ private var boost:Bool = false
 
           for i in 0..<numberOfPoints {
               points[i].x = CGFloat(i) * pixelFixer
-              var pureValue: CGFloat = CGFloat(data![i * compressionRate] * gain)
+              var pureValue: CGFloat = CGFloat(data![i * compressionRate]) * gain
 
               if pureValue == 0.0 {
                   points[i].y = waveOffset
@@ -183,9 +183,9 @@ private var boost:Bool = false
               }
 
               if limiter != 0 {
-                  pureValue = abs(Float(pureValue)) < limiter
+                  pureValue = abs(pureValue) < limiter
                       ? pureValue
-                      : (pureValue < 0 ? -1 * CGFloat(limiter) : CGFloat(limiter))
+                      : (pureValue < 0 ? -1 * limiter : limiter)
               }
 
               points[i].y = (pureValue * sensitivity)
@@ -199,12 +199,12 @@ private var boost:Bool = false
       else {
         for i in 0..<numberOfPoints {
           points[i].x = CGFloat(i) * pixelFixer
-          var pureValue: CGFloat = CGFloat(data![i * compressionRate] * gain)
+          var pureValue: CGFloat = CGFloat(data![i * compressionRate]) * gain
 
           if limiter != 0 {
-              pureValue = abs(Float(pureValue)) < limiter
+              pureValue = abs(pureValue) < limiter
                   ? pureValue
-                  : (pureValue < 0 ? -1 * CGFloat(limiter) : CGFloat(limiter))
+                  : (pureValue < 0 ? -1 * limiter : limiter)
           }
 
           points[i].y = (pureValue * sensitivity) + waveOffset

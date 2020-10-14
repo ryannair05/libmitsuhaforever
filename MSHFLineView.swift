@@ -58,15 +58,6 @@ import UIKit
     }
 
     override internal func resetWaveLayers() {
-        if waveLayer == nil {
-            initializeWaveLayers()
-        }
-        else if siriEnabled {
-          if subwaveLayer == nil || subSubwaveLayer == nil {
-              initializeWaveLayers()
-          }
-        }
-
         let path = createPath(
             withPoints: points,
             pointCount: 0,

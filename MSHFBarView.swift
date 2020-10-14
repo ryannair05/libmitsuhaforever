@@ -44,7 +44,7 @@ import UIKit
                 let layer = CALayer()
                 layer.cornerRadius = barCornerRadius
                 layer.frame = CGRect(
-                    x: CGFloat(CGFloat(i) * width) + barSpacing,
+                    x: CGFloat(i) * width + barSpacing,
                     y: 0,
                     width: barWidth,
                     height: frame.size.height)
@@ -61,7 +61,7 @@ import UIKit
             let layer = CALayer()
             layer.cornerRadius = barCornerRadius
             layer.frame = CGRect(
-                x: CGFloat(CGFloat(r) * width) + barSpacing,
+                x: CGFloat(r) * width + barSpacing,
                 y: 0,
                 width: barWidth,
                 height: frame.size.height)
@@ -73,7 +73,7 @@ import UIKit
             let layer = CALayer()
             layer.cornerRadius = barCornerRadius
             layer.frame = CGRect(
-                x: CGFloat(CGFloat(g) * width) + barSpacing,
+                x: CGFloat(g) * width + barSpacing,
                 y: 0,
                 width: barWidth,
                 height: frame.size.height)
@@ -85,7 +85,7 @@ import UIKit
             let layer = CALayer()
             layer.cornerRadius = barCornerRadius
             layer.frame = CGRect(
-                x: CGFloat(CGFloat(b) * width) + barSpacing,
+                x: CGFloat(b) * width + barSpacing,
                 y: 0,
                 width: barWidth,
                 height: frame.size.height)
@@ -105,7 +105,7 @@ import UIKit
     }
 
     @objc override public func updateWaveColor(_ waveColor: UIColor, subwaveColor: UIColor, subSubwaveColor: UIColor) {
-        if redBars == nil || greenBars == nil || blueBars == nil {
+        if redBars == nil {
             initializeWaveLayers()
         }
 
@@ -157,7 +157,7 @@ import UIKit
                 }
 
                 layer.frame = CGRect(
-                    x: CGFloat(CGFloat(i) * width) + barSpacing,
+                    x: CGFloat(i) * width + barSpacing,
                     y: points[i].y,
                     width: barWidth,
                     height: barHeight)
@@ -176,7 +176,7 @@ import UIKit
                 }
 
                 layer.frame = CGRect(
-                    x: CGFloat(CGFloat(r) * width) + barSpacing,
+                    x: CGFloat(r) * width + barSpacing,
                     y: points[r].y,
                     width: barWidth,
                     height: barHeight)

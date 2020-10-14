@@ -36,7 +36,7 @@ import Accelerate
     }
 
     internal func process(_ data: UnsafeMutablePointer<Float>, withLength length: Int) {
-        if delegate == nil {
+        guard let delegate = delegate else {
             return
         }
         if fft && length == Int(numberOfFrames) {
@@ -47,9 +47,9 @@ import Accelerate
             vDSP_fft_zrip(fftSetup, &output, 1, bufferLog2, FFTDirection(FFT_FORWARD))
             vDSP_zvabs(&output, 1, out, 1, numberOfFramesOver2)
             vDSP_vsmul(out, 1, &fftNormFactor, out, 1, numberOfFramesOver2)
-            delegate!.setSampleData(out, length: Int(numberOfFramesOver2) / 8)
+            delegate.setSampleData(out, length: Int(numberOfFramesOver2) / 8)
         } else {
-            delegate!.setSampleData(data, length: length)
+            delegate.setSampleData(data, length: length)
         }
     }
 }
