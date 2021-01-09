@@ -1,23 +1,20 @@
-#import "../generated-headers/libmitsuhaforever-Swift.h"
-#import <Accelerate/Accelerate.h> 
-#import "MSHFAudioSourceASS.h"
 #import <UIKit/UIKit.h>
+#import "MSHFAudioSourceASS.h"
+#import "MSHFAudioProcessingDelegate.h"
+#import "MSHFAudioProcessing.h"
+#define MSHFPrefsFile @"com.ryannair05.mitsuhaforever"
 
 @interface MSHFView : UIView <MSHFAudioDelegate, MSHFAudioProcessingDelegate> {
   NSUInteger cachedLength;
-  NSUInteger cachedNumberOfPoints;
   long long silentSince;
-  long long lastUpdate;
   bool MSHFHidden;
-  int bufferLog2;
-  FFTSetup fftSetup;
   float *window;
 }
 
-@property(nonatomic, assign) BOOL shouldUpdate;
 @property(nonatomic, assign) BOOL disableBatterySaver;
 @property(nonatomic, assign) BOOL autoHide;
-@property(nonatomic, assign) int numberOfPoints;
+@property(nonatomic, assign) NSInteger numberOfPoints;
+@property(nonatomic, assign) NSInteger cachedNumberOfPoints;
 
 @property(nonatomic, assign) double gain;
 @property(nonatomic, assign) double limiter;
@@ -30,7 +27,6 @@
 
 @property(nonatomic, assign) BOOL siriEnabled;
 
-@property(nonatomic, strong) UIColor *calculatedColor;
 @property(nonatomic, strong) UIColor *waveColor;
 @property(nonatomic, strong) UIColor *subwaveColor;
 @property(nonatomic, strong) UIColor *subSubwaveColor;

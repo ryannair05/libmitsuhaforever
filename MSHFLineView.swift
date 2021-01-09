@@ -1,39 +1,36 @@
 import UIKit
 
-@objc (MSHFLineView) final public class MSHFLineView: MSHFView {
+final public class MSHFLineView: MSHFView {
 
-    private var _lineThickness: CGFloat = 0.0
-    internal var lineThickness: CGFloat {
-        get {
-            _lineThickness
-        }
-        set(thickness) {
-            _lineThickness = thickness
-            waveLayer?.lineWidth = thickness
+    internal var lineThickness: CGFloat = 5.0 {
+        didSet(thickness) {
+            waveLayer.lineWidth = thickness
             subwaveLayer?.lineWidth = thickness
             subSubwaveLayer?.lineWidth = thickness
         }
     }
-    private var waveLayer: MSHFJelloLayer?
+    private var waveLayer =  MSHFJelloLayer()
     private var subwaveLayer: MSHFJelloLayer?
     private var subSubwaveLayer: MSHFJelloLayer?
-    private var cachedNumberOfPoints = 0
 
-    override internal func initializeWaveLayers() {
+    override public func initializeWaveLayers() {
         layer.sublayers = nil
-        waveLayer = MSHFJelloLayer()
-        waveLayer!.frame = bounds
-        layer.addSublayer(waveLayer!)
 
-        waveLayer!.zPosition = 0
-        waveLayer!.lineWidth = 5
-        waveLayer!.fillColor = UIColor.clear.cgColor
+        waveLayer.frame = bounds
+
+        ({ self.lineThickness = lineThickness })()
+
+        layer.addSublayer(waveLayer)
+
+        waveLayer.zPosition = 0
+        waveLayer.lineWidth = 5
+        waveLayer.fillColor = UIColor.clear.cgColor
 
         if siriEnabled {
             subwaveLayer = MSHFJelloLayer()
             subSubwaveLayer = MSHFJelloLayer()
 
-            subSubwaveLayer!.frame = waveLayer!.frame
+            subSubwaveLayer!.frame = waveLayer.frame
             subwaveLayer!.frame = subSubwaveLayer!.frame
 
             layer.addSublayer(subwaveLayer!)
@@ -50,14 +47,12 @@ import UIKit
         configureDisplayLink()
         resetWaveLayers()
 
-        waveLayer!.shouldAnimate = true
-        if siriEnabled {
-            subwaveLayer!.shouldAnimate = true
-            subSubwaveLayer!.shouldAnimate = true
-        }
+        waveLayer.shouldAnimate = true
+        subwaveLayer?.shouldAnimate = true
+        subSubwaveLayer?.shouldAnimate = true
     }
 
-    override internal func resetWaveLayers() {
+    override public func resetWaveLayers() {
         let path = createPath(
             withPoints: points,
             pointCount: 0,
@@ -65,63 +60,62 @@ import UIKit
 
         NSLog("[libmitsuha]: Resetting Wave Layers...")
 
-        waveLayer!.path = path
+        waveLayer.path = path
         if siriEnabled {
             subwaveLayer!.path = path
             subSubwaveLayer!.path = path
         }
     }
 
-   @objc override public func updateWaveColor(_ waveColor: UIColor, subwaveColor: UIColor) {
+    @objc override public func updateWave(_ waveColor: UIColor, subwaveColor: UIColor) {
         self.waveColor = waveColor
         self.subwaveColor = subwaveColor
-        self.waveLayer?.strokeColor = waveColor.cgColor
+        self.waveLayer.strokeColor = waveColor.cgColor
     }
 
-    @objc override public func updateWaveColor(_ waveColor: UIColor, subwaveColor: UIColor, subSubwaveColor: UIColor) {
-        if waveLayer == nil || subwaveLayer == nil || subSubwaveLayer == nil {
+    @objc override public func updateWave(_ waveColor: UIColor, subwaveColor: UIColor, subSubwaveColor: UIColor) {
+        if subwaveLayer == nil || subSubwaveLayer == nil {
             initializeWaveLayers()
         }
-
         self.waveColor = waveColor
         self.subwaveColor = subwaveColor
         self.subSubwaveColor = subSubwaveColor
-        waveLayer!.strokeColor = waveColor.cgColor
+        waveLayer.strokeColor = waveColor.cgColor
         subwaveLayer!.strokeColor = subwaveColor.cgColor
         subSubwaveLayer!.strokeColor = subSubwaveColor.cgColor
-        waveLayer!.compositingFilter = "screenBlendMode"
+        waveLayer.compositingFilter = "screenBlendMode"
         subwaveLayer!.compositingFilter = "screenBlendMode"
         subSubwaveLayer!.compositingFilter = "screenBlendMode"
     }
 
-    override internal func redraw() {
+    override public func redraw() {
         super.redraw()
 
         let path = createPath(withPoints: points,pointCount: numberOfPoints, in: bounds)
-        waveLayer?.path = path
+        waveLayer.path = path
 
         if siriEnabled {
-          DispatchQueue.main.asyncAfter(
-            deadline: DispatchTime.now() + (0.25 * Double(NSEC_PER_SEC)) / Double(NSEC_PER_SEC),
-              execute: {
-                  self.subwaveLayer?.path = path
-          })
-          DispatchQueue.main.asyncAfter(
-            deadline: DispatchTime.now() + (0.50 * Double(NSEC_PER_SEC)) / Double(NSEC_PER_SEC),
-              execute: {
-                  self.subSubwaveLayer?.path = path
+            DispatchQueue.main.asyncAfter(
+                deadline: .now() + 0.25,
+                execute: {
+                    self.subwaveLayer?.path = path
+            })
+            DispatchQueue.main.asyncAfter(
+                deadline: .now() + 0.5,
+                execute: {
+                    self.subSubwaveLayer?.path = path
             })
         }
     }
 
-    internal override func setSampleData(_ data: UnsafeMutablePointer<Float>?, length: Int) {
+    override public func setSampleData(_ data: UnsafeMutablePointer<Float>!, length: Int32) {
         super.setSampleData(data, length: length)
 
         points[numberOfPoints - 1].x = bounds.size.width
         points[numberOfPoints - 1].y = waveOffset
         points[0].y = points[numberOfPoints - 1].y
     }
-
+    
     private func createPath(withPoints points: UnsafeMutablePointer<CGPoint>?, pointCount: Int, in rect: CGRect) -> CGPath {
         if pointCount > 0 {
             let path = UIBezierPath()
@@ -139,18 +133,19 @@ import UIKit
             let pixelFixer: CGFloat = bounds.size.width / CGFloat(numberOfPoints)
 
             if cachedNumberOfPoints != numberOfPoints {
+                free(self.points)
                 self.points = unsafeBitCast(malloc(MemoryLayout<CGPoint>.size * numberOfPoints), to: UnsafeMutablePointer<CGPoint>.self)
                 cachedNumberOfPoints = numberOfPoints
 
                 for i in 0..<numberOfPoints {
-                  self.points[i].x = CGFloat(i) * pixelFixer
-                  self.points[i].y = waveOffset // self.bounds.size.height/2;
+                    self.points[i].x = CGFloat(i) * pixelFixer
+                    self.points[i].y = waveOffset // self.bounds.size.height/2;
                 }
 
                 self.points[numberOfPoints - 1].x = bounds.size.width
                 self.points[numberOfPoints - 1].y = waveOffset
                 self.points[0].y = self.points[numberOfPoints - 1].y // self.bounds.size.height/2;
-             }
+            }
             return createPath(withPoints: self.points, pointCount: numberOfPoints,in: bounds)
         }
     }

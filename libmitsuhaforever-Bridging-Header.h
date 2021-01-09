@@ -1,6 +1,2 @@
-#import "public/DarwinNotificationsManager.h"
-
-@interface SBMediaController
-+ (id)sharedInstance;
-- (BOOL)isPlaying;
-@end
+#import "public/MSHFBarView.h"
+#import "public/MSHFDotView.h"

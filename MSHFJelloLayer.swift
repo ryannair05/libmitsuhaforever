@@ -4,14 +4,11 @@ final internal class MSHFJelloLayer: CAShapeLayer {
     internal var shouldAnimate = false
 
     override func action(forKey event: String) -> CAAction? {
-        if shouldAnimate {
-            if event == "path" {
+        if shouldAnimate && event == "path" {
+            let animation = CABasicAnimation(keyPath: event)
+            animation.duration = 0.15
 
-                let animation = CABasicAnimation(keyPath: event)
-                animation.duration = 0.15
-
-                return animation
-            }
+            return animation
         }
         return super.action(forKey: event)
     }

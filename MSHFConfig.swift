@@ -1,15 +1,8 @@
 import UIKit
 
 private extension UIColor {
-    class func hbcp_propertyList(value: Any?) -> UIColor? {
-        if let array = value as? [Int], array.count == 3 || array.count == 4 {
-            let floats = array.map { CGFloat($0) }
-            return self.init(red: floats[0] / 255,
-                green: floats[1] / 255,
-                blue: floats[2] / 255,
-                alpha: array.count == 4 ? floats[3] : 1)
-        }
-        else if var string = value as? String {
+    class func hbcp_propertyList(value: String?) -> UIColor? {
+        if var string = value {
             if let range = string.range(of: ":") {
                 let location = string.distance(from: string.startIndex, to: range.lowerBound)
                 string = String(string[..<string.index(string.startIndex, offsetBy: location)])
@@ -27,7 +20,6 @@ private extension UIColor {
             let scanner = Scanner(string: string)
             scanner.charactersToBeSkipped = CharacterSet(charactersIn: "#")
             scanner.scanHexInt64(&hex)
-
             if string.count == 9 {
                 return self.init(
                     red: CGFloat((hex & 0xFF000000) >> 24) / 255,
@@ -50,8 +42,11 @@ private func LCPParseColorString(_ hexString: String?, _ fallback: String) -> UI
     if let result = UIColor.hbcp_propertyList(value:hexString) {
         return result
     }
-    return UIColor.hbcp_propertyList(value:fallback) ?? UIColor.black
+    else {
+        return UIColor.hbcp_propertyList(value:fallback) ?? UIColor.black
+    }
 }
+
 
 @objc (MSHFConfig) final public class MSHFConfig: NSObject {
 
@@ -59,20 +54,19 @@ private func LCPParseColorString(_ hexString: String?, _ fallback: String) -> UI
     private var application: String?
     @objc private var style = 0
     @objc private var colorMode = 0
-    private var enableDynamicGain = false
     private var enableAutoUIColor = false
     @objc private var enableCoverArtBugFix = false
     private var disableBatterySaver = false
     private var enableFFT = false
     private var enableAutoHide = false
-    private var gain: CGFloat = 0.0
-    private var limiter: CGFloat = 0.0
+    private var gain: Double = 50.0
+    private var limiter: Double = 0.0
     private var waveColor: UIColor?
     private var subwaveColor: UIColor?
     private var subSubwaveColor: UIColor?
     private var calculatedColor: UIColor?
-    private var numberOfPoints: UInt = 0
-    private var fps: Int = 0
+    private var numberOfPoints: Int = 0
+    private var fps: Int = 24
     @objc private var waveOffset: CGFloat = 0.0
     @objc private var waveOffsetOffset: CGFloat = 0.0
     private var sensitivity: CGFloat = 0.0
@@ -80,31 +74,26 @@ private func LCPParseColorString(_ hexString: String?, _ fallback: String) -> UI
     private var barSpacing: CGFloat = 0.0
     private var barCornerRadius: CGFloat = 0.0
     private var lineThickness: CGFloat = 0.0
-    private var ignoreColorFlow = false
-    private var enableCircleArtwork = false
+    @objc private var ignoreColorFlow = false
     @objc private var view: MSHFView?
-
-    init(dictionary dict: NSDictionary) {
+    
+    init(dictionary dict: Dictionary<String, Any>) {
         super.init()
         setDictionary(dict)
-        let MSHFPreferencesChanged = "com.ryannair05.mitsuhaforever/ReloadPrefs"
-        DarwinNotificationsManager.sharedInstance().register(forNotificationName: MSHFPreferencesChanged, callback: {
-            self.reload()
-        })
+   
+        // let MSHFPreferencesChanged =  "com.ryannair05.mitsuhaforever/ReloadPrefs"
     }
-
+    
     @objc public func initializeView(withFrame frame: CGRect) {
-        var superview: UIView? = nil
-        var index: Int = 0
+        var superview: UIView?
+        var index: Int?
 
-        if view != nil {
-            if view!.superview != nil {
-                superview = view!.superview
-                index = superview?.subviews.firstIndex(of: view!) ?? NSNotFound
-            }
+        if let view = view {
+            superview = view.superview
+            index = superview?.subviews.firstIndex(of: view)
 
-            view!.stop()
-            view!.removeFromSuperview()
+            view.stop()
+            view.removeFromSuperview()
         }
 
         switch style {
@@ -124,11 +113,12 @@ private func LCPParseColorString(_ hexString: String?, _ fallback: String) -> UI
                 view = MSHFJelloView(frame: frame)
         }
 
-        if superview != nil {
-            if index == NSNotFound {
-                superview!.addSubview(view!)
-            } else {
-                superview!.insertSubview(view!, at: index)
+        if let superview = superview {
+            if let index = index  {
+                superview.insertSubview(view!, at: index)
+            }
+            else {
+                superview.addSubview(view!)
             }
         }
 
@@ -137,8 +127,8 @@ private func LCPParseColorString(_ hexString: String?, _ fallback: String) -> UI
 
     private func configureView() {
         view!.autoHide = enableAutoHide
-        view!.displayLink?.preferredFramesPerSecond = fps
-        view!.numberOfPoints = Int(numberOfPoints)
+        view!.displayLink!.preferredFramesPerSecond = fps
+        view!.numberOfPoints = numberOfPoints
         view!.waveOffset = waveOffset + waveOffsetOffset
         view!.gain = gain
         view!.limiter = limiter
@@ -146,49 +136,35 @@ private func LCPParseColorString(_ hexString: String?, _ fallback: String) -> UI
         view!.audioProcessing?.fft = enableFFT
         view!.disableBatterySaver = disableBatterySaver
         view!.siriEnabled = colorMode == 1
-        
-        guard let waveColor = waveColor else {
-            if calculatedColor != nil {
-            view!.updateWaveColor(
-                calculatedColor!.copy() as! UIColor,
-                subwaveColor: calculatedColor!.copy() as! UIColor)
-            }
-            return
-        }
 
-        if colorMode == 2 {
-            if style == 4 {
-                view!.updateWaveColor(
-                    waveColor.copy() as! UIColor,
-                    subwaveColor: waveColor.copy() as! UIColor,
-                    subSubwaveColor: waveColor.copy() as! UIColor)
-            } else {
-                view!.updateWaveColor(
-                    waveColor.copy() as! UIColor,
-                    subwaveColor: waveColor.copy() as! UIColor)
+        if let waveColor = waveColor {
+            if colorMode == 2 {
+                view!.updateWave(waveColor, subwaveColor: waveColor)
+            } else if let subwaveColor = subwaveColor, let subSubwaveColor = subSubwaveColor, colorMode == 1 {
+                view!.updateWave(waveColor,
+                    subwaveColor: subwaveColor,
+                    subSubwaveColor: subSubwaveColor)
             }
-        } else if colorMode == 1 && subwaveColor != nil && subSubwaveColor != nil {
-            view!.updateWaveColor(
-                waveColor.copy() as! UIColor,
-                subwaveColor: subwaveColor!.copy() as! UIColor,
-                subSubwaveColor: subSubwaveColor!.copy() as! UIColor)
+        }
+        else if let calculatedColor = calculatedColor {
+            view!.updateWave(calculatedColor, subwaveColor: calculatedColor)
         }
     }
 
-    private func getAverageColor(from image: UIImage?, withAlpha alpha: CGFloat) -> UIColor {
+    private func getAverageColor(from image: UIImage, withAlpha alpha: CGFloat) -> UIColor {
         let size = CGSize(width: 1, height: 1)
         UIGraphicsBeginImageContext(size)
         let ctx = UIGraphicsGetCurrentContext()
         ctx!.interpolationQuality = .medium
 
-        image?.draw(in: CGRect(x: 0, y: 0, width: 1, height: 1), blendMode: .copy, alpha: 1)
+        image.draw(in: CGRect(x: 0, y: 0, width: 1, height: 1), blendMode: .copy, alpha: 1)
 
-        let data : [UInt8] = Array(UnsafeBufferPointer(start: ctx?.data?.bindMemory(to: UInt8.self, capacity: 4), count: 4))
+        let data = Array(UnsafeBufferPointer(start: ctx?.data?.bindMemory(to: UInt8.self, capacity: 4), count: 4)).map{CGFloat($0)}
 
         let color = UIColor(
-            red: CGFloat(data[2]) / 255.0, 
-            green: CGFloat(data[1]) / 255.0,
-            blue: CGFloat(data[0]) / 255.0,
+            red: data[2] / 255.0,
+            green: data[1] / 255.0,
+            blue: data[0] / 255.0,
             alpha: alpha)
 
         UIGraphicsEndImageContext()
@@ -199,131 +175,98 @@ private func LCPParseColorString(_ hexString: String?, _ fallback: String) -> UI
         guard let view = view else {
             return
         }
-        if colorMode != 2 {
-            var color = waveColor!
-            var scolor = waveColor!
-            var sscolor = waveColor!
-
-            if colorMode == 1 {
-                color = UIColor(red: 1.0,
-                    green: 0.0,
-                    blue: 0.0,
-                    alpha: dynamicColorAlpha)
-                scolor = UIColor(red: 0.0,
-                    green: 1.0,
-                    blue: 0.0,
-                    alpha: dynamicColorAlpha)
-                sscolor = UIColor(red: 0.0,
-                    green: 0.0,
-                    blue: 1.0,
-                    alpha: dynamicColorAlpha)
-            } else {
-                color = getAverageColor(from: image,
-                    withAlpha: dynamicColorAlpha)
-                calculatedColor = color
-            }
-
-            if colorMode == 1 {
-                view.updateWaveColor(color,
-                    subwaveColor: scolor,
-                    subSubwaveColor: sscolor)
-            } else if style == 4 {
-                view.updateWaveColor(color,
-                    subwaveColor: color,
-                    subSubwaveColor: color)
-            }
-            else {
-                view.updateWaveColor(color,
-                    subwaveColor: color)
-            }
-        } else {
+        
+        if colorMode == 1 {
+            let color = UIColor(red: 1.0,
+                 green: 0.0,
+                 blue: 0.0,
+                 alpha: dynamicColorAlpha)
+            let scolor = UIColor(red: 0.0,
+                 green: 1.0,
+                 blue: 0.0,
+                 alpha: dynamicColorAlpha)
+            let sscolor = UIColor(red: 0.0,
+                 green: 0.0,
+                 blue: 1.0,
+                 alpha: dynamicColorAlpha)
+             
+            view.updateWave(color,
+                 subwaveColor: scolor,
+                 subSubwaveColor: sscolor)
+            
+        }
+        else if let image = image, colorMode == 0 {
+            let color = getAverageColor(from: image, withAlpha: dynamicColorAlpha)
+            calculatedColor = color
+            view.updateWave(color, subwaveColor: color)
+        }
+        else {
             let color = waveColor!
-            if style == 4 {
-                view.updateWaveColor(color,
-                    subwaveColor: color,
-                    subSubwaveColor: color)
-            } else {
-                view.updateWaveColor(color,
-                    subwaveColor: color)
-            }
+            view.updateWave(color, subwaveColor: color)
         }
     }
 
-    private func setDictionary(_ dict: NSDictionary?) {
-        application = (dict?["application"] as! String)
-        enabled = dict?["enabled"] as? Bool ?? true
+    private func setDictionary(_ dict: Dictionary<String, Any>) {
+        application = (dict["application"] as! String)
+        enabled = dict["enabled"] as? Bool ?? true
 
-        enableDynamicGain = dict?["enableDynamicGain"] as? Bool ?? false
-        style = dict?["style"] as? Int ?? 0
-        colorMode = dict?["colorMode"] as? Int ?? 0
-        enableAutoUIColor = dict?["enableAutoUIColor"] as? Bool ?? true
-        ignoreColorFlow = dict?["ignoreColorFlow"] as? Bool ?? false
-        enableCircleArtwork = dict?["enableCircleArtwork"] as? Bool ?? false
-        enableCoverArtBugFix = dict?["enableCoverArtBugFix"] as? Bool ?? false
-        disableBatterySaver = dict?["disableBatterySaver"] as? Bool ?? false
-        enableFFT = dict?["enableFFT"] as? Bool ?? false
-        enableAutoHide = dict?["enableAutoHide"] as? Bool ?? true
-
-        if dict?["waveColor"] != nil {
-            if dict!["waveColor"] is UIColor {
-                waveColor = (dict!["waveColor"] as! UIColor)
-            } else if dict!["waveColor"] is NSString {
-                waveColor = LCPParseColorString(
-                    dict?["waveColor"] as? String,
-                    "#000000:0.5")
-            } else {
-                waveColor = UIColor.black.withAlphaComponent(0.5)
-            }
-        } else {
+        style = dict["style"] as? Int ?? 0
+        colorMode = dict["colorMode"] as? Int ?? 0
+        enableAutoUIColor = dict["enableAutoUIColor"] as? Bool ?? true
+        ignoreColorFlow = dict["ignoreColorFlow"] as? Bool ?? false
+        enableCoverArtBugFix = dict["enableCoverArtBugFix"] as? Bool ?? false
+        disableBatterySaver = dict["disableBatterySaver"] as? Bool ?? false
+        enableFFT = dict["enableFFT"] as? Bool ?? false
+        enableAutoHide = dict["enableAutoHide"] as? Bool ?? true
+        
+        if let value = dict["waveColor"] as? UIColor {
+            waveColor = value
+        }
+        else if let value = dict["waveColor"] as? String {
+            waveColor = LCPParseColorString(value, "#000000:0.5")
+        }
+        else {
             waveColor = UIColor.black.withAlphaComponent(0.5)
         }
-
-      if dict?["subwaveColor"] != nil {
-            if dict!["subwaveColor"] is UIColor {
-                subwaveColor = (dict!["subwaveColor"] as! UIColor)
-            } else if dict!["subwaveColor"] is NSString {
-                subwaveColor = LCPParseColorString(
-                    dict!["subwaveColor"] as? String,
-                    "#000000:0.5")
-            } else {
-                subwaveColor = UIColor.black.withAlphaComponent(0.5)
-            }
-        } else {
+        
+        if let value = dict["subwaveColor"] as? UIColor {
+            subwaveColor = value
+        }
+        else if let value = dict["subwaveColor"] as? String {
+            subwaveColor = LCPParseColorString(value, "#000000:0.5")
+        }
+        else {
             subwaveColor = UIColor.black.withAlphaComponent(0.5)
         }
-      if dict?["subSubwaveColor"] != nil {
-            if dict?["subSubwaveColor"] is UIColor {
-                subwaveColor = (dict?["subSubwaveColor"] as! UIColor)
-            } else if dict?["subSubwaveColor"] is NSString {
-                subwaveColor = LCPParseColorString(
-                    dict?["subSubwaveColor"] as? String,
-                    "#000000:0.5")
-            } else {
-                subwaveColor = UIColor.black.withAlphaComponent(0.5)
-            }
-        } else {
+        
+        if let value = dict["subSubwaveColor"] as? UIColor {
+            subwaveColor = value
+        }
+        else if let value = dict["subSubwaveColor"] as? String {
+            subwaveColor = LCPParseColorString(value, "#000000:0.5")
+        }
+        else {
             subwaveColor = UIColor.black.withAlphaComponent(0.5)
         }
-      gain = dict?["gain"] as? CGFloat ?? 50
-      limiter = dict?["limiter"] as? CGFloat ?? 0
-      numberOfPoints = dict?["numberOfPoints"] as? UInt ?? 8
-      sensitivity = dict?["sensitivity"] as? CGFloat ?? 1
-      dynamicColorAlpha = dict?["dynamicColorAlpha"] as? CGFloat ?? 0.6
+        
+      gain = dict["gain"] as? Double ?? 50
+      limiter = dict["limiter"] as? Double ?? 0
+      numberOfPoints = dict["numberOfPoints"] as? Int ?? 8
+      sensitivity = dict["sensitivity"] as? CGFloat ?? 1
+      dynamicColorAlpha = dict["dynamicColorAlpha"] as? CGFloat ?? 0.6
 
-      barSpacing = dict?["barSpacing"] as? CGFloat ?? 5
-      barCornerRadius = dict?["barCornerRadius"] as? CGFloat ?? 0
-      lineThickness = dict?["lineThickness"] as? CGFloat ?? 5
+      barSpacing = dict["barSpacing"] as? CGFloat ?? 5
+      barCornerRadius = dict["barCornerRadius"] as? CGFloat ?? 0
+      lineThickness = dict["lineThickness"] as? CGFloat ?? 5
 
-      waveOffset = dict?["waveOffset"] as? CGFloat ?? 0
-      waveOffset = (dict?["negateOffset"] as? Bool ?? false
-            ? waveOffset * -1
-            : waveOffset)
+      waveOffset = dict["waveOffset"] as? CGFloat ?? 0
 
-        fps = dict?["fps"] as? Int ?? 24
+      fps = dict["fps"] as? Int ?? 24
+
     }
 
-    private class func parseConfig(forApplication name: String?) -> NSDictionary {
-        var prefs: [AnyHashable : Any] = [:]
+    private class func parseConfig(forApplication name: String) -> Dictionary<String, Any> {
+        var prefs: [String : Any] = [:]
         prefs["application"] = name
 
         let MSHFPrefsFile = "/var/mobile/Library/Preferences/com.ryannair05.mitsuhaforever.plist"
@@ -338,26 +281,21 @@ private func LCPParseColorString(_ hexString: String?, _ fallback: String) -> UI
         }
 
         for key in prefs.keys {
-            guard let key = key as? String else {
-                continue
-            }
-            let removedKey = key.replacingOccurrences(of: "MSHF\(name ?? "")", with: "")
-            let lowerCaseKey = "\((removedKey as NSString).substring(to: 1).lowercased())\((removedKey as NSString).substring(from: 1))"
+            let removedKey = key.replacingOccurrences(of: "MSHF\(name)", with: "")
+            let lowerCaseKey = "\(removedKey.prefix(1).lowercased())\(removedKey.dropFirst(1))"
 
             prefs[lowerCaseKey] = prefs[key]
         }
 
-        prefs["gain"] = prefs["gain"] ?? NSNumber(value: 50)
         prefs["subwaveColor"] = prefs["waveColor"]
         prefs["subSubwaveColor"] = prefs["waveColor"]
-        prefs["waveOffset"] = prefs["waveOffset"] ?? NSNumber(value: 0)
 
-        return prefs as NSDictionary
+        return prefs
     }
 
-    private func reload() {
+    @objc private func reload() {
         let oldStyle = style
-        setDictionary(MSHFConfig.parseConfig(forApplication: application))
+        setDictionary(MSHFConfig.parseConfig(forApplication: application ?? ""))
         guard let view = view else {
             return
         }
@@ -369,7 +307,7 @@ private func LCPParseColorString(_ hexString: String?, _ fallback: String) -> UI
         }
     }
 
-    @objc public class func loadConfig(forApplication name: String?) -> MSHFConfig? {
+    @objc public class func loadConfig(forApplication name: String) -> MSHFConfig {
         return MSHFConfig(
             dictionary: MSHFConfig.parseConfig(forApplication: name))
     }

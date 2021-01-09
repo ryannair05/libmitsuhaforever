@@ -1,7 +1,9 @@
 FINALPACKAGE = 1
 
-export TARGET = iphone:14.0:11.0
-export ADDITIONAL_CFLAGS = -DTHEOS_LEAN_AND_MEAN -fobjc-arc
+PREFIX = $(THEOS)/toolchain/Xcode.xctoolchain/usr/bin/
+
+export TARGET = iphone:13.5:12.0
+export ADDITIONAL_CFLAGS = -DTHEOS_LEAN_AND_MEAN -fobjc-arc -O3
 
 ARCHS = arm64 arm64e
 
@@ -10,6 +12,7 @@ include $(THEOS)/makefiles/common.mk
 LIBRARY_NAME = libmitsuhaforever
 $(LIBRARY_NAME)_OBJC_FILES = $(wildcard *.m)
 $(LIBRARY_NAME)_FILES = $(wildcard *.swift)
+$(LIBRARY_NAME)_SWIFTFLAGS += -enable-library-evolution
 $(LIBRARY_NAME)_SWIFT_BRIDGING_HEADER = libmitsuhaforever-Bridging-Header.h
 
 include $(THEOS_MAKE_PATH)/library.mk
