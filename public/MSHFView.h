@@ -2,7 +2,8 @@
 #import "MSHFAudioSourceASS.h"
 #import "MSHFAudioProcessingDelegate.h"
 #import "MSHFAudioProcessing.h"
-#define MSHFPrefsFile @"com.ryannair05.mitsuhaforever"
+
+#define MSHFPrefsFile @"/var/mobile/Library/Preferences/com.ryannair05.mitsuhaforever.plist"
 
 @interface MSHFView : UIView <MSHFAudioDelegate, MSHFAudioProcessingDelegate> {
   NSUInteger cachedLength;

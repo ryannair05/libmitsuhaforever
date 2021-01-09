@@ -33,8 +33,7 @@ BOOL boost;
     self.audioSource = audioSource;
     self.audioSource.delegate = self;
 
-    self.audioProcessing =
-        [[MSHFAudioProcessing alloc] initWithBufferSize:1024];
+    self.audioProcessing = [[MSHFAudioProcessing alloc] initWithBufferSize:1024];
     self.audioProcessing.delegate = self;
     self.audioProcessing.fft = true;
 
@@ -135,7 +134,7 @@ BOOL boost;
 - (void)updateBuffer:(float *)bufferData withLength:(int)length {
   if (self.autoHide) {
     for (int i = 0; i < length / 4; i++) {
-      if (bufferData[i] > 0.000005 || bufferData[i] < -0.000005) {
+      if (bufferData[i] > 0.000005) {
         silentSince = (long long)[[NSDate date] timeIntervalSinceReferenceDate];
         break;
       }

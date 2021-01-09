@@ -106,7 +106,7 @@
 - (void)updateWaveColor:(UIColor *)waveColor
            subwaveColor:(UIColor *)subwaveColor
         subSubwaveColor:(UIColor *)subSubwaveColor {
-  if (!self.redBars || !self.greenBars || !self.blueBars) {
+  if (!self.redBars) {
     [self initializeWaveLayers];
   }
   

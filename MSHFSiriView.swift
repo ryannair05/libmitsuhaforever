@@ -168,8 +168,8 @@ final public class MSHFSiriView: MSHFView {
                 self.points = unsafeBitCast(malloc(MemoryLayout<CGPoint>.size * numberOfPoints), to: UnsafeMutablePointer<CGPoint>.self)
                 cachedNumberOfPoints = numberOfPoints
                 for i in 0..<numberOfPoints {
-                self.points[i].x = CGFloat(i) * pixelFixer
-                self.points[i].y = waveOffset //self.bounds.size.height/2;
+                    self.points[i].x = CGFloat(i) * pixelFixer
+                    self.points[i].y = waveOffset //self.bounds.size.height/2;
                 }
                 self.points[numberOfPoints - 1].x = bounds.size.width
                 self.points[numberOfPoints - 1].y = waveOffset
