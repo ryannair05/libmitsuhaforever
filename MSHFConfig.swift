@@ -3,11 +3,6 @@ import UIKit
 private extension UIColor {
     class func hbcp_propertyList(value: String?) -> UIColor? {
         if var string = value {
-            if let range = string.range(of: ":") {
-                let location = string.distance(from: string.startIndex, to: range.lowerBound)
-                string = String(string[..<string.index(string.startIndex, offsetBy: location)])
-            }
-
             if string.count == 4 || string.count == 5 {
                 let r = String(repeating: string[string.index(string.startIndex, offsetBy: 1)], count: 2)
                 let g = String(repeating: string[string.index(string.startIndex, offsetBy: 2)], count: 2)
@@ -27,11 +22,16 @@ private extension UIColor {
                     blue: CGFloat((hex & 0x0000FF00) >> 8) / 255,
                     alpha: CGFloat((hex & 0x000000FF) >> 0) / 255)
             } else {
+                var alpha: Float = 1
+                if scanner.scanString(":", into: nil) {
+					scanner.scanFloat(&alpha)
+                }
+
                 return self.init(
                     red: CGFloat((hex & 0xFF0000) >> 16) / 255,
                     green: CGFloat((hex & 0x00FF00) >> 8) / 255,
                     blue: CGFloat((hex & 0x0000FF) >> 0) / 255,
-                    alpha: 1)
+                    alpha: CGFloat(alpha))
             }
         }
         return nil
